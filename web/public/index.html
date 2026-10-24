@@ -211,7 +211,8 @@
   .st.done .dot { background: var(--green); }
   .st.done .dot::after { content: "✓"; color: #fff; font-size: 10px; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
   @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,179,30,.4); } 50% { box-shadow: 0 0 0 6px rgba(245,179,30,0); } }
-  .pay-btn { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; height: 44px; border-radius: 13px; background: #fff; border: 1.5px solid var(--sep); color: var(--ink); font-weight: 700; font-size: 14px; text-decoration: none; }
+  .pay-btn { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; width: 100%; height: 44px; border-radius: 13px; background: #fff; border: 1.5px solid var(--sep); color: var(--ink); font-weight: 700; font-size: 14px; text-decoration: none; cursor: pointer; font-family: inherit; }
+  .copy-pay { display: block; width: 100%; margin-top: 8px; border: none; background: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: underline; }
   .pay-btn svg { color: var(--green); }
   .order-meta { text-align: center; font-size: 11.5px; color: var(--ink2); margin-top: 8px; line-height: 1.6; }
   .pickup { text-align: center; margin-top: 10px; padding: 12px; background: var(--paper); border: 1.5px dashed rgba(255,199,44,.8); border-radius: 14px; }
@@ -494,7 +495,8 @@
           <div class="st" id="st2"><div class="dot"></div>配餐中</div>
           <div class="st" id="st3"><div class="dot"></div>已完成</div>
         </div>
-        <a class="pay-btn" id="payLink" target="_blank"><svg width="15" height="16" viewBox="0 0 15 16"><use href="#i-qr"/></svg>打开支付（建议发到微信里）</a>
+        <button class="pay-btn" id="payBtn" type="button"><svg width="15" height="16" viewBox="0 0 15 16"><use href="#i-qr"/></svg>打开支付（建议发到微信里）</button>
+        <button class="copy-pay" id="copyPayBtn" type="button" style="display:none">复制支付链接，粘贴到微信打开 ↗</button>
         <div class="order-meta" id="orderMeta"></div>
         <div class="pickup" id="pickup" style="display:none"><div class="lbl">取 餐 码</div><div class="code" id="pickupCode"></div></div>
         <div class="row-btns">
@@ -598,7 +600,7 @@ const saveColl = () => localStorage.setItem("mcd-sign-coll", JSON.stringify(coll
 
 const $ = id => document.getElementById(id);
 const mbtiInput = $("mbtiInput");
-let picked = null, lastSign = null, lastOrder = null, lastMeta = null, typewriterTimer = null;
+let picked = null, lastSign = null, lastOrder = null, lastMeta = null, typewriterTimer = null, payUrl = "";
 
 /* ================= MBTI 输入 ================= */
 function showPersona(t) {
@@ -1098,9 +1100,15 @@ $("orderBtn").onclick = async () => {
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastOrder = j.orderId;
+    payUrl = j.payH5Url || "";
     setStep(1);
-    $("payLink").href = j.payH5Url;
-    $("orderMeta").textContent = `订单 ${j.orderId.slice(-8)} · 待支付 ¥${j.amount}`;
+    if (!payUrl) {
+      $("payPanel").classList.add("show");
+      $("orderMeta").textContent = `订单 ${j.orderId.slice(-8)} 已创建，但未返回支付链接 — 可到麦当劳 App 订单页支付`;
+    } else {
+      $("orderMeta").textContent = `订单 ${j.orderId.slice(-8)} · 待支付 ¥${j.amount}`;
+      $("copyPayBtn").style.display = "block";
+    }
     $("pickup").style.display = "none";
     $("payPanel").classList.add("show");
   } catch (e) { $("err2").textContent = "下单失败：" + e.message; }
@@ -1136,19 +1144,20 @@ $("cancelBtn").onclick = async () => {
 if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; showPersona(settings.mbti); }
 $("liveText").textContent = "今日全国同签 · " + todayStr().slice(5).replace("-", "月") + "日";
 
-/* 预览 iframe 沙箱可能拦截 target=_blank：被拦时复制链接兜底 */
-document.addEventListener("click", e => {
-  const a = e.target.closest('a[target="_blank"]');
-  if (!a) return;
-  setTimeout(() => {
-    try {
-      const w = window.open(a.href, "_blank");
-      if (!w) throw new Error("blocked");
-    } catch {
-      navigator.clipboard?.writeText(a.href).then(() => toast("预览里开不了新窗口，链接已复制 🔗")).catch(() => toast(a.href));
-    }
-  }, 50);
-});
+/* ================= 支付跳转（用户手势内直接开新窗，被拦时复制兜底） ================= */
+function copyPayLink() {
+  if (!payUrl) return toast("还没有可用的支付链接");
+  navigator.clipboard?.writeText(payUrl)
+    .then(() => toast("支付链接已复制 🔗 粘贴到微信/浏览器打开即可付款"))
+    .catch(() => toast(payUrl));
+}
+$("payBtn").onclick = () => {
+  if (!payUrl) return copyPayLink();
+  const w = window.open(payUrl, "_blank");   // 同步调用，保留用户手势，不会被弹窗拦截
+  if (!w) { copyPayLink(); return; }
+  toast("已在新标签打开支付页 · 手机上建议直接发到微信里支付");
+};
+$("copyPayBtn").onclick = copyPayLink;
 
 </script>
 
