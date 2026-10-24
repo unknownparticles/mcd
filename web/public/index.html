@@ -687,6 +687,20 @@ $("cancelBtn").onclick = async () => {
 /* ================= 初始化 ================= */
 if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; showPersona(settings.mbti); }
 $("liveText").textContent = "今日全国同签 · " + todayStr().slice(5).replace("-", "月") + "日";
+
+/* 预览 iframe 沙箱可能拦截 target=_blank：被拦时复制链接兜底 */
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[target="_blank"]');
+  if (!a) return;
+  setTimeout(() => {
+    try {
+      const w = window.open(a.href, "_blank");
+      if (!w) throw new Error("blocked");
+    } catch {
+      navigator.clipboard?.writeText(a.href).then(() => toast("预览里开不了新窗口，链接已复制 🔗")).catch(() => toast(a.href));
+    }
+  }, 50);
+});
 </script>
 </body>
 </html>
