@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="2000" viewBox="0 0 640 2000">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="8%" r="95%">
+      <stop offset="0%" stop-color="#FFFDF6"/>
+      <stop offset="45%" stop-color="#FFF9EF"/>
+      <stop offset="100%" stop-color="#F7E9CE"/>
+    </radialGradient>
+  </defs>
+  <rect width="640" height="2000" fill="url(#glow)"/>
+  <text x="320" y="1080" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="420" fill="#F5E7C8">M</text>
+  <g fill="#F3E4C4" opacity=".8">
+    <path transform="translate(66,300)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
+    <path transform="translate(472,478) scale(.8)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
+    <path transform="translate(82,790) scale(.9)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
+    <path transform="translate(482,960)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
+  </g>
+</svg>
