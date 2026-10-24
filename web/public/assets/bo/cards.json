@@ -1,0 +1,352 @@
+[
+ {
+  "file": "assets/bo/cards/card_r1c1.png",
+  "row": 1,
+  "col": 1,
+  "w": 275,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c2.png",
+  "row": 1,
+  "col": 2,
+  "w": 271,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r1c3.png",
+  "row": 1,
+  "col": 3,
+  "w": 270,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c4.png",
+  "row": 1,
+  "col": 4,
+  "w": 264,
+  "h": 276
+ },
+ {
+  "file": "assets/bo/cards/card_r1c5.png",
+  "row": 1,
+  "col": 5,
+  "w": 253,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c6.png",
+  "row": 1,
+  "col": 6,
+  "w": 263,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c7.png",
+  "row": 1,
+  "col": 7,
+  "w": 259,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c8.png",
+  "row": 1,
+  "col": 8,
+  "w": 262,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c9.png",
+  "row": 1,
+  "col": 9,
+  "w": 264,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r1c10.png",
+  "row": 1,
+  "col": 10,
+  "w": 268,
+  "h": 275
+ },
+ {
+  "file": "assets/bo/cards/card_r2c1.png",
+  "row": 2,
+  "col": 1,
+  "w": 276,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c2.png",
+  "row": 2,
+  "col": 2,
+  "w": 272,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c3.png",
+  "row": 2,
+  "col": 3,
+  "w": 270,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c4.png",
+  "row": 2,
+  "col": 4,
+  "w": 264,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c5.png",
+  "row": 2,
+  "col": 5,
+  "w": 254,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c6.png",
+  "row": 2,
+  "col": 6,
+  "w": 263,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r2c7.png",
+  "row": 2,
+  "col": 7,
+  "w": 259,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r2c8.png",
+  "row": 2,
+  "col": 8,
+  "w": 261,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r2c9.png",
+  "row": 2,
+  "col": 9,
+  "w": 265,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r2c10.png",
+  "row": 2,
+  "col": 10,
+  "w": 268,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r3c1.png",
+  "row": 3,
+  "col": 1,
+  "w": 276,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c2.png",
+  "row": 3,
+  "col": 2,
+  "w": 272,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c3.png",
+  "row": 3,
+  "col": 3,
+  "w": 270,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c4.png",
+  "row": 3,
+  "col": 4,
+  "w": 264,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c5.png",
+  "row": 3,
+  "col": 5,
+  "w": 253,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c6.png",
+  "row": 3,
+  "col": 6,
+  "w": 263,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c7.png",
+  "row": 3,
+  "col": 7,
+  "w": 259,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c8.png",
+  "row": 3,
+  "col": 8,
+  "w": 261,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c9.png",
+  "row": 3,
+  "col": 9,
+  "w": 264,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r3c10.png",
+  "row": 3,
+  "col": 10,
+  "w": 268,
+  "h": 262
+ },
+ {
+  "file": "assets/bo/cards/card_r4c1.png",
+  "row": 4,
+  "col": 1,
+  "w": 276,
+  "h": 269
+ },
+ {
+  "file": "assets/bo/cards/card_r4c2.png",
+  "row": 4,
+  "col": 2,
+  "w": 272,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c3.png",
+  "row": 4,
+  "col": 3,
+  "w": 270,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c4.png",
+  "row": 4,
+  "col": 4,
+  "w": 263,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c5.png",
+  "row": 4,
+  "col": 5,
+  "w": 253,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c6.png",
+  "row": 4,
+  "col": 6,
+  "w": 262,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c7.png",
+  "row": 4,
+  "col": 7,
+  "w": 259,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c8.png",
+  "row": 4,
+  "col": 8,
+  "w": 262,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c9.png",
+  "row": 4,
+  "col": 9,
+  "w": 264,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r4c10.png",
+  "row": 4,
+  "col": 10,
+  "w": 268,
+  "h": 268
+ },
+ {
+  "file": "assets/bo/cards/card_r5c1.png",
+  "row": 5,
+  "col": 1,
+  "w": 275,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c2.png",
+  "row": 5,
+  "col": 2,
+  "w": 272,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c3.png",
+  "row": 5,
+  "col": 3,
+  "w": 270,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c4.png",
+  "row": 5,
+  "col": 4,
+  "w": 263,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c5.png",
+  "row": 5,
+  "col": 5,
+  "w": 254,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c6.png",
+  "row": 5,
+  "col": 6,
+  "w": 263,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c7.png",
+  "row": 5,
+  "col": 7,
+  "w": 259,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c8.png",
+  "row": 5,
+  "col": 8,
+  "w": 262,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c9.png",
+  "row": 5,
+  "col": 9,
+  "w": 263,
+  "h": 274
+ },
+ {
+  "file": "assets/bo/cards/card_r5c10.png",
+  "row": 5,
+  "col": 10,
+  "w": 269,
+  "h": 274
+ }
+]
