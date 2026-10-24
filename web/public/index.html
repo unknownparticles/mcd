@@ -580,51 +580,111 @@ function renderSign(j, mbti) {
 /* ================= 分享签卡（canvas） ================= */
 $("shareBtn").onclick = () => {
   const j = lastMeta, s = j.sign, mbti = j.mbti;
-  const W = 640, H = 960, cv = document.createElement("canvas");
-  cv.width = W; cv.height = H;
+  // —— 今日运势：综合评分 + 限定签/优惠券/连签加成 ——
+  const base = Math.round(62 + (s.score ?? 0.5) * 33);           // 62~95
+  const streakBonus = Math.min(4, streak.days);
+  const fortune = Math.min(99, base + (s.limited ? 3 : 0) + (s.coupon ? 2 : 0) + streakBonus);
+  const stars = fortune >= 95 ? 5 : fortune >= 88 ? 4 : fortune >= 78 ? 3 : fortune >= 68 ? 2 : 1;
+  const level = fortune >= 95 ? "大吉 · 天选麦门" : fortune >= 88 ? "中吉" : fortune >= 78 ? "吉" : fortune >= 68 ? "小吉" : "平";
+  const boosts = [
+    streakBonus > 0 ? `连续求签 ${streak.days} 天，运势 +${streakBonus}（已计入今日指数）`
+      : "明天再来求签，连签越多运势越高",
+    `把这张签发给同为 ${mbti} 的麦友，对上同签双方运势 +5`,
+    "应签下单、光盘这顿，今日运势圆满 +10",
+  ];
+  const W = 640, MAXH = 2000, cv = document.createElement("canvas");
+  cv.width = W; cv.height = MAXH;
   const x = cv.getContext("2d");
-  // 底
-  x.fillStyle = "#FFF8EC"; x.fillRect(0, 0, W, H);
-  x.strokeStyle = "#E8C88A"; x.lineWidth = 3; x.strokeRect(18, 18, W - 36, H - 36);
-  x.strokeStyle = "#E8C88A"; x.lineWidth = 1; x.strokeRect(28, 28, W - 56, H - 56);
-  // 顶部红头
-  x.fillStyle = "#DA291C"; x.fillRect(40, 40, W - 80, 150);
-  x.fillStyle = "#FFC72C"; x.font = "800 52px -apple-system, PingFang SC, sans-serif";
-  x.textAlign = "center"; x.fillText("麦 门 今 日 签", W / 2, 110);
-  x.fillStyle = "rgba(255,255,255,.9)"; x.font = "600 24px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`${j.date} · ${j.term ?? ""} ${j.festival ?? ""}`, W / 2, 152);
+  const round = (px, py, w, h, r) => { x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r); x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath(); };
+  // 底 + 双边框
+  x.fillStyle = "#FFF9EF"; x.fillRect(0, 0, W, H);
+  x.strokeStyle = "#E8C88A"; x.lineWidth = 3; x.strokeRect(16, 16, W - 32, H - 32);
+  x.lineWidth = 1; x.strokeRect(26, 26, W - 52, H - 52);
+  // 顶部红头（含金线）
+  x.fillStyle = "#DA291C"; round(40, 40, W - 80, 148, 14); x.fill();
+  x.strokeStyle = "rgba(255,199,44,.65)"; x.lineWidth = 2; round(50, 50, W - 100, 128, 10); x.stroke();
+  x.fillStyle = "#FFC72C"; x.textAlign = "center";
+  x.font = "800 50px -apple-system, PingFang SC, sans-serif";
+  x.fillText("麦 门 今 日 签", W / 2, 108);
+  x.fillStyle = "rgba(255,255,255,.92)"; x.font = "600 23px -apple-system, PingFang SC, sans-serif";
+  x.fillText(`${j.date} · ${j.term ?? ""}${j.festival ? " · " + j.festival : ""}`, W / 2, 150);
+  if (s.limited) {
+    x.fillStyle = "#B8860B"; round(W / 2 - 92, 206, 184, 40, 20); x.fill();
+    x.fillStyle = "#FFF9EF"; x.font = "700 22px -apple-system, PingFang SC, sans-serif";
+    x.fillText(`🏮 ${s.limited}限定签`, W / 2, 233);
+    var yNext = 272;
+  } else var yNext = 240;
   // 人格
-  x.fillStyle = "#8A5A00"; x.font = "700 30px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`${mbti} · ${j.persona}，全国同签`, W / 2, 246);
-  // 签位
-  x.fillStyle = "#C77F0A"; x.font = "800 34px -apple-system, PingFang SC, sans-serif";
-  x.fillText(s.grade, W / 2, 312);
-  x.fillStyle = "#1D1D1F"; x.font = "800 44px -apple-system, PingFang SC, sans-serif";
-  wrapText(x, s.product, W / 2, 372, W - 160, 56);
-  // 价格
-  x.fillStyle = "#DA291C"; x.font = "800 64px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`¥${s.price}`, W / 2, 470);
+  x.fillStyle = "#8A5A00"; x.font = "700 28px -apple-system, PingFang SC, sans-serif";
+  x.fillText(`${mbti} · ${j.persona}，全国同签`, W / 2, yNext); yNext += 64;
+  // —— 今日运势区块 ——
+  x.fillStyle = "#FBF1DC"; round(56, yNext - 18, W - 112, 168, 16); x.fill();
+  x.strokeStyle = "#E8C88A"; x.lineWidth = 1.5; round(56, yNext - 18, W - 112, 168, 16); x.stroke();
+  x.fillStyle = "#B8860B"; x.font = "600 22px -apple-system, PingFang SC, sans-serif";
+  x.fillText("今 日 运 势", W / 2 - 150, yNext + 28);
+  x.fillStyle = "#DA291C"; x.font = "800 76px Georgia, serif";
+  x.fillText(String(fortune), W / 2 - 40, yNext + 92);
+  x.fillStyle = "#E8A317"; x.font = "700 34px -apple-system, PingFang SC, sans-serif";
+  x.fillText("★".repeat(stars) + "☆".repeat(5 - stars), W / 2 + 120, yNext + 68);
+  x.fillStyle = "#B8860B"; x.font = "700 24px -apple-system, PingFang SC, sans-serif";
+  x.fillText(level, W / 2 + 120, yNext + 104);
+  yNext += 196;
+  // 签位 + 商品 + 价格
+  x.fillStyle = "#C77F0A"; x.font = "800 32px -apple-system, PingFang SC, sans-serif";
+  x.fillText(s.grade, W / 2, yNext); yNext += 56;
+  x.fillStyle = "#1D1D1F"; x.font = "800 42px -apple-system, PingFang SC, sans-serif";
+  yNext += wrapText(x, s.product, W / 2, yNext, W - 150, 54) * 54; yNext += 10;
+  x.fillStyle = "#DA291C"; x.font = "800 60px -apple-system, PingFang SC, sans-serif";
+  x.fillText(`¥${s.price}`, W / 2, yNext + 48); yNext += 66;
   if (s.origPrice > s.price) {
-    x.fillStyle = "#AEAEB2"; x.font = "400 28px -apple-system, PingFang SC, sans-serif";
-    x.fillText(`原价 ¥${s.origPrice} · 今日立省 ¥${(s.origPrice - s.price).toFixed(1)}`, W / 2, 516);
+    x.fillStyle = "#AEAEB2"; x.font = "400 25px -apple-system, PingFang SC, sans-serif";
+    x.fillText(`原价 ¥${s.origPrice} · 立省 ¥${(s.origPrice - s.price).toFixed(1)}`, W / 2, yNext + 8); yNext += 44;
   }
   // 签文
-  x.fillStyle = "#6B4A12"; x.font = "500 30px -apple-system, PingFang SC, sans-serif";
-  wrapText(x, `「${s.fortune}」`, W / 2, 580, W - 150, 46);
-  // 理由（前 3 条）
-  x.fillStyle = "#86868B"; x.font = "400 24px -apple-system, PingFang SC, sans-serif";
-  let ry = 700;
-  for (const rsn of (s.reasons ?? []).slice(0, 3)) { x.fillText("✓ " + rsn, W / 2, ry); ry += 38; }
-  // footer + 链接
+  x.fillStyle = "#6B4A12"; x.font = "500 29px -apple-system, PingFang SC, sans-serif";
+  yNext += 16 + wrapText(x, `「${s.fortune}」`, W / 2, yNext + 24, W - 150, 44) * 44;
+  // —— 为什么点吃这个 ——
+  dashedLine(x, 70, yNext += 26, W - 70); yNext += 48;
+  x.fillStyle = "#1D1D1F"; x.font = "800 28px -apple-system, PingFang SC, sans-serif";
+  x.fillText("为什么点吃这个 🤔", W / 2, yNext); yNext += 46;
+  x.font = "400 24px -apple-system, PingFang SC, sans-serif";
+  for (const rsn of (s.reasons ?? []).slice(0, 3)) {
+    x.fillStyle = "#E8A317"; x.fillText("✓", 108, yNext);
+    x.fillStyle = "#55524C";
+    yNext += wrapText(x, rsn, W / 2 + 12, yNext, W - 250, 36, 12) * 36 + 10;
+  }
+  // —— 运势加成（先排文本，再按实际高度描框）——
+  yNext += 14;
+  const boxTop = yNext;
+  x.fillStyle = "#B8860B"; x.font = "800 25px -apple-system, PingFang SC, sans-serif";
+  x.fillText("⚡ 运势加成玩法", W / 2, boxTop + 38);
+  x.font = "400 23px -apple-system, PingFang SC, sans-serif"; x.fillStyle = "#6B4A12";
+  let by = boxTop + 76;
+  for (const b of boosts) { by += wrapText(x, "· " + b, W / 2, by, W - 170, 34, 12) * 34 + 6; }
+  x.strokeStyle = "#E8A317"; x.setLineDash([8, 7]); x.lineWidth = 2;
+  round(56, boxTop, W - 112, by - boxTop + 12, 14); x.stroke(); x.setLineDash([]);
+  // footer（动态位置）+ 高度裁切
+  const footY = by + 52;
   x.fillStyle = "#1D1D1F"; x.font = "700 26px -apple-system, PingFang SC, sans-serif";
-  x.fillText("明天，签就换了。今天全国都吃这个。", W / 2, 850);
-  x.fillStyle = "#AEAEB2"; x.font = "400 22px -apple-system, PingFang SC, sans-serif";
-  x.fillText("github.com/unknownparticles/mcd", W / 2, 892);
-  const url = cv.toDataURL("image/png");
-  $("shareImg").src = url;
+  x.fillText("明天，签就换了。今天全国都吃这个。", W / 2, footY);
+  x.fillStyle = "#AEAEB2"; x.font = "400 21px -apple-system, PingFang SC, sans-serif";
+  x.fillText("github.com/unknownparticles/mcd", W / 2, footY + 42);
+  const finalH = footY + 84;
+  const out = document.createElement("canvas");
+  out.width = W; out.height = finalH;
+  const ox = out.getContext("2d");
+  ox.fillStyle = "#FFF9EF"; ox.fillRect(0, 0, W, finalH);
+  ox.drawImage(cv, 0, 0);
+  ox.strokeStyle = "#E8C88A"; ox.lineWidth = 3; ox.strokeRect(16, 16, W - 32, finalH - 32);
+  ox.lineWidth = 1; ox.strokeRect(26, 26, W - 52, finalH - 52);
+  $("shareImg").src = out.toDataURL("image/png");
   $("shareOv").classList.add("on");
 };
-function wrapText(x, text, cx, y, maxW, lh) {
+function dashedLine(x, x1, y, x2) {
+  x.strokeStyle = "#E8C88A"; x.setLineDash([6, 6]); x.lineWidth = 1;
+  x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); x.setLineDash([]);
+}
+function wrapText(x, text, cx, y, maxW, lh, leftInset = 0) {
   let line = "", lines = [];
   for (const ch of text) {
     if (x.measureText(line + ch).width > maxW) { lines.push(line); line = ch; }
