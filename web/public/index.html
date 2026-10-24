@@ -170,6 +170,18 @@
   .chip { padding: 7px 16px; border-radius: 999px; border: 1.5px solid var(--sep); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); }
   .chip.on { background: var(--accent-soft); border-color: var(--gold); color: var(--accent); }
   .budget-input { width: 84px; padding: 7px 12px; border: 1.5px solid var(--sep); border-radius: 10px; font-size: 15px; text-align: right; outline: none; font-family: inherit; }
+  .taste-lbl { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+  .taste-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tchip { padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--sep); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); transition: all .18s; }
+  .tchip.on-like { background: var(--accent-soft); border-color: var(--gold); color: var(--accent); }
+  .tchip.on-dis { background: #FCE9E7; border-color: #DA291C; color: #B71C13; }
+  .shaking { animation: bodyshake .5s cubic-bezier(.36,.07,.19,.97); }
+  @keyframes bodyshake {
+    10%, 90% { transform: translateX(-2px) rotate(-.3deg); }
+    20%, 80% { transform: translateX(4px) rotate(.4deg); }
+    30%, 50%, 70% { transform: translateX(-7px) rotate(-.5deg); }
+    40%, 60% { transform: translateX(7px) rotate(.5deg); }
+  }
   .switch { position: relative; width: 50px; height: 30px; }
   .switch input { opacity: 0; width: 0; height: 0; }
   .knob { position: absolute; inset: 0; background: rgba(120,120,128,.24); border-radius: 999px; cursor: pointer; transition: background .25s; }
@@ -242,7 +254,7 @@
   </div>
 
   <button class="go" id="go">抽 今 日 签</button>
-  <div class="go-hint" id="goHint">每天一签 · 签到明天就变</div>
+  <div class="go-hint" id="goHint">每天一签 · 签到明天就变 · 📳 手机摇一摇也能求签</div>
   <div class="loading" id="loading"><div class="spinner"></div>正在结合天气、节气与实时菜单摇签…</div>
   <div class="err" id="err1"></div>
 
@@ -320,6 +332,14 @@
       <label class="switch"><input type="checkbox" id="claimToggle" checked><span class="knob"></span></label>
     </div>
   </div>
+  <h2 style="margin-top:20px">口味订制 · 私人签</h2>
+  <div class="hint">选了「爱吃」会优先出，选了「不吃」直接不会出现在你的签里</div>
+  <div class="set-card">
+    <div class="taste-lbl">😋 爱吃（可多选）</div>
+    <div class="taste-chips" id="likeChips"></div>
+    <div class="taste-lbl" style="margin-top:14px">🚫 不吃（忌口）</div>
+    <div class="taste-chips" id="dislikeChips"></div>
+  </div>
   <h2 style="margin-top:20px">签册 · 限定收集</h2>
   <div class="hint" id="collHint">节气与节日会出现限定签，收齐是一种修行</div>
   <div class="set-card"><div class="coll-grid" id="collGrid"></div></div>
@@ -364,7 +384,7 @@ const DIMS = ["EI","SN","TF","JP","TF","JP"]; // 每题对应维度（第4题为
 const PAIRS = { EI:["E","I"], SN:["S","N"], TF:["T","F"], JP:["J","P"] };
 
 /* ================= 本地状态 ================= */
-const settings = Object.assign({ budget: "", claim: true, mbti: "" }, JSON.parse(localStorage.getItem("mcd-sign-set") || "{}"));
+const settings = Object.assign({ budget: "", claim: true, mbti: "", like: [], dislike: [] }, JSON.parse(localStorage.getItem("mcd-sign-set") || "{}"));
 const streak = Object.assign({ last: "", days: 0, total: 0 }, JSON.parse(localStorage.getItem("mcd-sign-streak") || "{}"));
 const coll = JSON.parse(localStorage.getItem("mcd-sign-coll") || "[]");
 const saveSet = () => localStorage.setItem("mcd-sign-set", JSON.stringify(settings));
@@ -436,6 +456,36 @@ function renderQuiz() {
   }
 }
 
+/* ================= 摇一摇求签 ================= */
+let shakePermAsked = false;
+function requestShakePerm() {
+  if (shakePermAsked) return;
+  shakePermAsked = true;
+  try {
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function")
+      DeviceMotionEvent.requestPermission().catch(() => {});
+  } catch { /* 不支持就算了 */ }
+}
+(function initShake() {
+  if (typeof DeviceMotionEvent === "undefined") return;
+  let peaks = 0, winStart = 0, lastFire = 0;
+  window.addEventListener("devicemotion", e => {
+    const a = e.accelerationIncludingGravity;
+    if (!a || a.x == null) return;
+    const now = Date.now();
+    if (now - lastFire < 4000) return;           // 冷却，防止连环触发
+    const mag = Math.hypot(a.x, a.y, a.z);
+    if (now - winStart > 1300) { winStart = now; peaks = 0; }
+    if (Math.abs(mag - 9.8) > 11) peaks++;       // 剧烈晃动一次记一峰
+    if (peaks >= 3) {
+      peaks = 0; lastFire = now;
+      document.body.classList.remove("shaking"); void document.body.offsetWidth;
+      document.body.classList.add("shaking");
+      $("go").click();
+    }
+  });
+})();
+
 /* ================= 定位 ================= */
 $("locBtn").onclick = () => {
   const btn = $("locBtn"), st = $("locStatus");
@@ -467,6 +517,7 @@ $("settingsBtn").onclick = () => {
   $("budgetInput").value = settings.budget;
   $("claimToggle").checked = settings.claim;
   document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", (c.dataset.b || "") === String(settings.budget)));
+  renderTastes();
   renderColl();
   openSheet($("settingsSheet"));
 };
@@ -477,6 +528,36 @@ document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
 $("budgetInput").oninput = e => { settings.budget = e.target.value; saveSet(); };
 $("claimToggle").onchange = e => { settings.claim = e.target.checked; saveSet(); };
 $("settingsDone").onclick = closeSheets;
+
+/* ================= 口味订制（私人签） ================= */
+const TASTES = [
+  { label: "🥩 牛肉", keys: ["牛", "巨无霸", "安格斯"] },
+  { label: "🍗 鸡肉", keys: ["鸡"] },
+  { label: "🥓 猪肉培根", keys: ["猪", "培根"] },
+  { label: "🐟 海鲜", keys: ["鳕鱼", "虾"] },
+  { label: "🌶️ 辣", keys: ["辣"] },
+  { label: "☕ 咖啡", keys: ["咖啡", "拿铁", "美式"] },
+  { label: "🥤 汽水可乐", keys: ["可乐", "汽水", "雪碧"] },
+  { label: "🍦 冰甜冷饮", keys: ["冰淇淋", "圆筒", "圣代", "麦旋风", "派", "雪冰", "奶昔"] },
+  { label: "🍟 薯条薯饼", keys: ["薯"] },
+];
+function renderTastes() {
+  const render = (boxId, key, cls) => {
+    $(boxId).innerHTML = TASTES.map((t, i) =>
+      `<button class="tchip${settings[key].includes(i) ? " " + cls : ""}" data-i="${i}">${t.label}</button>`).join("");
+    $(boxId).querySelectorAll(".tchip").forEach(b => b.onclick = () => {
+      const i = Number(b.dataset.i), arr = settings[key];
+      const at = arr.indexOf(i);
+      at >= 0 ? arr.splice(at, 1) : arr.push(i);
+      saveSet(); renderTastes();
+    });
+  };
+  render("likeChips", "like", "on-like");
+  render("dislikeChips", "dislike", "on-dis");
+}
+function tasteKeywords(key) {
+  return settings[key].flatMap(i => TASTES[i].keys);
+}
 
 function renderColl() {
   const all = [...TERMS.map(t => ["节气", t]), ...FESTS.map(f => ["节日", f])];
@@ -513,6 +594,7 @@ function toast(msg) {
 /* ================= 求签 ================= */
 function setStep(n) { [1,2,3].forEach(i => $("st"+i).className = "st" + (i === n ? " cur" : i < n ? " done" : "")); }
 $("go").onclick = async () => {
+  requestShakePerm(); // iOS 需要在用户手势里申请动作权限
   const mbti = mbtiInput.value.trim().toUpperCase();
   if (!PERSONA[mbti]) { $("err1").textContent = "请输入有效的 MBTI（如 INTJ），或做一次 20 秒快测"; return; }
   const city = $("city").value.trim(), kw = $("kw").value.trim();
@@ -521,8 +603,10 @@ $("go").onclick = async () => {
   $("go").disabled = true; $("loading").classList.add("on");
   $("signCard").classList.remove("show"); $("payPanel").classList.remove("show");
   try {
+    const prefs = { like: tasteKeywords("like"), dislike: tasteKeywords("dislike") };
     const r = await fetch("/api/recommend", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mbti, city, keyword: kw || undefined, budget: settings.budget || undefined, claimCoupons: settings.claim }) });
+      body: JSON.stringify({ mbti, city, keyword: kw || undefined, budget: settings.budget || undefined, claimCoupons: settings.claim,
+        prefs: (prefs.like.length || prefs.dislike.length) ? prefs : undefined }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastSign = j.sign; lastSign.storeCode = j.store.storeCode;

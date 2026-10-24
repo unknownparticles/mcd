@@ -32,16 +32,26 @@ export function extractJsonObjects(text) {
 export function createMcdClient(token) {
   if (!token) throw new Error("缺少 MCD_TOKEN");
 
-  async function rpc(method, params) {
-    const res = await fetch(MCD_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json, text/event-stream",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ jsonrpc: "2.0", id: idSeq++, method, params }),
-    });
+  // 瞬时网络抖动自动重试一次（只对网络层失败重试，业务错误不重试——下单防重）
+  async function rpc(method, params, retried = false) {
+    let res;
+    try {
+      res = await fetch(MCD_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json, text/event-stream",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ jsonrpc: "2.0", id: idSeq++, method, params }),
+      });
+    } catch (e) {
+      if (!retried) {
+        await new Promise((r) => setTimeout(r, 600));
+        return rpc(method, params, true);
+      }
+      throw e;
+    }
     if (!res.ok) {
       const body = await res.text().catch(() => "");
       throw new Error(`MCP HTTP ${res.status}: ${body.slice(0, 200)}`);

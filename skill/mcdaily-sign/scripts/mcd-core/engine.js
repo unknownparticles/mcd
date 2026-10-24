@@ -77,6 +77,17 @@ function termScore(dateInfo, f) {
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
+// ---- 私人订制口味（用户在设置里选的"爱吃/不吃"）----
+// prefs: { like: ["牛肉","咖啡",...], dislike: ["辣","猪肉",...] }，关键词对商品名+标签做 includes 匹配
+function tasteHits(meal, words) {
+  if (!words?.length) return [];
+  const nameTags = meal.name + (meal.tags ?? []).join("");
+  return words.filter((w) => nameTags.includes(w));
+}
+function tasteDislikeHit(meal, prefs) {
+  return tasteHits(meal, prefs?.dislike);
+}
+
 // 每日同签：date+mbti+mealcode 的确定性哈希微扰
 // → 同一天、同一 MBTI，全国用户抽到同一支签（社交话题钩子），次日自动换签（回访钩子）
 function daySeed(dateStr, mbti, code) {
@@ -110,8 +121,12 @@ export async function recommend(opts) {
   const store = stores[0];
   const mealsResp = await mcd.meals(store.storeCode, opts.orderType ?? 1, opts.beType ?? 1);
   const meals = parseMeals(mealsResp).filter((m) => m.price > 0);
-  const mealsFinal = opts.budget ? meals.filter((m) => m.price <= opts.budget) : meals;
-  if (!mealsFinal.length) throw new Error(`预算 ¥${opts.budget} 内没有可用餐品`);
+  const mealsFinal0 = opts.budget ? meals.filter((m) => m.price <= opts.budget) : meals;
+  if (!mealsFinal0.length) throw new Error(`预算 ¥${opts.budget} 内没有可用餐品`);
+  // 私人订制：「不吃」的商品直接排除（除非排除后全空，则保留但重罚）
+  const noDis = mealsFinal0.filter((m) => !tasteDislikeHit(m, opts.prefs).length);
+  const excluded = noDis.length ? true : false;
+  const mealsFinal = noDis.length ? noDis : mealsFinal0;
 
   // 4. 优惠券（可选：自动领取）
   let coupons = [];
@@ -121,7 +136,7 @@ export async function recommend(opts) {
     } catch { /* 领券失败不阻塞推荐 */ }
   }
 
-  // 5. 打分（叠加每日确定性微扰，人格/天气仍主导）
+  // 5. 打分（叠加每日确定性微扰与私人订制口味，人格/天气仍主导）
   const scored = mealsFinal.map((meal, i) => {
     const f = features(meal);
     const mbtiS = mbtiScore(profile, f, meal);
@@ -129,8 +144,10 @@ export async function recommend(opts) {
     const { score: cS, coupon } = couponScore(meal, coupons);
     const tS = termScore(dateInfo, f);
     const seed = daySeed(dateStr, mbti, meal.code);
-    const total = 0.5 * mbtiS + 0.2 * wS + 0.15 * cS + 0.15 * tS + (seed - 0.5) * 0.04;
-    return { meal, features: f, coupon, total, seed, parts: { mbti: mbtiS, weather: wS, coupon: cS, term: tS }, idx: i };
+    const likeHit = tasteHits(meal, opts.prefs?.like);
+    const prefS = Math.min(0.4, likeHit.length * 0.2); // 每命中一个"爱吃"+0.2，封顶 +0.4 —— 显式偏好应压过人格默认
+    const total = 0.5 * mbtiS + 0.2 * wS + 0.15 * cS + 0.15 * tS + prefS + (seed - 0.5) * 0.04;
+    return { meal, features: f, coupon, total, seed, likeHit, parts: { mbti: mbtiS, weather: wS, coupon: cS, term: tS, pref: prefS }, idx: i };
   });
   scored.sort((a, b) => b.total - a.total);
   const top = scored.slice(0, 3);
@@ -159,8 +176,10 @@ export async function recommend(opts) {
     const reasons = [];
     const nameTags = s.meal.name + s.meal.tags.join("");
     const matched = (profile.like ?? []).filter((w) => nameTags.includes(w));
+    if (s.likeHit?.length) reasons.unshift(`私人订制：你爱吃「${s.likeHit.slice(0, 2).join("、")}」，专属加成`);
     if (matched.length) reasons.push(`${profile.persona}偏爱「${matched.slice(0, 2).join("、")}」，与本品高度契合`);
     else reasons.push(`${profile.persona}的点餐哲学：${profile.behavior}`);
+    if (excluded && opts.prefs?.dislike?.length) reasons.push(`已按你的口味排除「${opts.prefs.dislike.slice(0, 2).join("、")}」类商品`);
     if (s.parts.weather >= 0.6 && wReason) reasons.push(wReason);
     if (s.coupon) reasons.push(`自动匹配到优惠券「${s.coupon.title}」`);
     if (dateInfo.festival) reasons.push(`今天${dateInfo.festival}，节点氛围加成`);

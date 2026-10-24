@@ -58,6 +58,7 @@ const server = createServer(async (req, res) => {
         keyword: body.keyword,
         budget: body.budget ? Number(body.budget) : undefined,
         claimCoupons: body.claimCoupons !== false,
+        prefs: body.prefs && (body.prefs.like?.length || body.prefs.dislike?.length) ? body.prefs : undefined,
       });
       return json(200, r);
     }
