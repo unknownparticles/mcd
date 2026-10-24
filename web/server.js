@@ -3,7 +3,7 @@
 import { createServer } from "node:http";
 import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { join, dirname, extname, resolve } from "node:path";
-import { homedir } from "node:os";
+import { homedir, networkInterfaces } from "node:os";
 import { fileURLToPath } from "node:url";
 import { recommend } from "../skill/mcdaily-sign/scripts/mcd-core/engine.js";
 import { createMcdClient, extractJsonObjects } from "../skill/mcdaily-sign/scripts/mcd-core/mcd-client.js";
@@ -101,4 +101,11 @@ const server = createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => console.log(`麦门今日签 Web 已启动: http://localhost:${PORT}`));
+server.listen(PORT, () => {
+  console.log(`麦门今日签 Web 已启动: http://localhost:${PORT}`);
+  try {
+    const ips = Object.values(networkInterfaces()).flat()
+      .filter(n => n && n.family === "IPv4" && !n.internal).map(n => n.address);
+    for (const ip of ips) console.log(`内网可访问: http://${ip}:${PORT}  （手机连同一 Wi-Fi 打开）`);
+  } catch { /* ignore */ }
+});
