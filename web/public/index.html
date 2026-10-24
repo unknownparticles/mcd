@@ -170,6 +170,11 @@
   .reasons-t svg { color: var(--gold-deep); }
   .reason { display: flex; gap: 8px; font-size: 12.5px; line-height: 1.6; color: var(--ink); padding: 6px 0; border-bottom: 1px dashed var(--sep); }
   .reason:last-child { border-bottom: none; }
+  .mind-row { display: flex; gap: 10px; margin-top: 16px; padding: 11px 13px; background: rgba(255,199,44,.12); border: 1px dashed rgba(255,199,44,.75); border-radius: 12px; animation: rise .5s cubic-bezier(.2,.8,.2,1) backwards; }
+  .mind-badge { flex-shrink: 0; align-self: flex-start; font-size: 10.5px; font-weight: 800; color: #FFFFFF; background: var(--red); border-radius: 7px; padding: 3px 8px; letter-spacing: .08em; }
+  .mind-txt { font-size: 12.5px; line-height: 1.7; color: var(--ink); display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .mind-txt b { font-weight: 800; }
+  .mind-txt span { color: var(--ink2); }
   .reason .tick { color: var(--gold-deep); font-weight: 800; flex-shrink: 0; }
   .meta-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; padding-bottom: 10px; }
   .meta-pill { font-size: 11px; color: var(--ink2); background: rgba(255,199,44,.12); border: 1px solid rgba(255,199,44,.5); padding: 3px 9px; border-radius: 999px; }
@@ -511,6 +516,10 @@
         <div class="reasons">
           <div class="reasons-t"><svg width="13" height="13" viewBox="0 0 15 15" style="color:#DA291C"><use href="#i-star"/></svg>为什么是它</div>
           <div id="reasons"></div>
+        </div>
+        <div class="mind-row" id="mindRow" style="display:none">
+          <span class="mind-badge">奇门心态</span>
+          <div class="mind-txt" id="mindTxt"></div>
         </div>
         <div class="meta-row" id="pills"></div>
       </div>
@@ -1272,6 +1281,24 @@ function renderSign(j, mbti) {
   buzz([30, 50, 30]);
   typeFortune(s.fortune);
   $("colSign").scrollTop = 0;
+  loadQimen();
+}
+
+/* ================= 奇门心态（时家奇门 · 每 2 小时随辰换门） ================= */
+let qimenCache = null, qimenAt = 0;
+async function loadQimen() {
+  const row = $("mindRow");
+  try {
+    if (!qimenCache || Date.now() - qimenAt > 3600e3) {
+      qimenCache = await (await fetch("/api/qimen")).json();
+      qimenAt = Date.now();
+    }
+    const q = qimenCache;
+    $("mindTxt").innerHTML =
+      `<b>${q.ju} · ${q.xun} · 值符${q.zhiFuStar} 值使【${q.zhiShi}】临${q.bagua}宫（${q.dir}）</b>` +
+      `<span>心态关键词「${q.kw}」—— ${q.text}；${q.taboo}。今天${q.dayGZ}日${q.timeGZ}时，两个时辰后换门。</span>`;
+    row.style.display = "";
+  } catch { row.style.display = "none"; }
 }
 
 /* ================= 分享签卡（canvas + SVG 背景/前景资源） ================= */
