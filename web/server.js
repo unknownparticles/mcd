@@ -8,6 +8,7 @@ import { join, dirname, extname, resolve } from "node:path";
 import { homedir, networkInterfaces } from "node:os";
 import { fileURLToPath } from "node:url";
 import { recommend } from "../skill/mcdaily-sign/scripts/mcd-core/engine.js";
+import { resolveDate } from "../skill/mcdaily-sign/scripts/mcd-core/solarterms.js";
 import { createMcdClient, extractJsonObjects } from "../skill/mcdaily-sign/scripts/mcd-core/mcd-client.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -51,6 +52,12 @@ let ipCache = null, ipCacheAt = 0;
 const handler = async (req, res) => {
   const json = (code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
   try {
+    // 卡牌游戏用：今日节气/节日（北京时间）
+    if (req.url === "/api/dateinfo" && req.method === "GET") {
+      const d = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
+      const di = resolveDate(d);
+      return json(200, { date: d, term: di.term ?? null, festival: di.festival ?? null });
+    }
     if (req.method === "GET") return serveStatic(req, res);
 
     // 网络定位兜底（浏览器无 geolocation API 时，如 http 内网环境）：用出口公网 IP 粗定位

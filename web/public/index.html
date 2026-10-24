@@ -277,6 +277,26 @@
   .coll-cell.got { background: linear-gradient(140deg, #FFD95E, var(--gold)); border: none; color: var(--ink); font-weight: 700; }
   .coll-cell b { font-size: 13px; }
 
+  /* ============ 麦门卡牌 · 每日一抽 ============ */
+  .draw-stage { display: flex; flex-direction: column; align-items: center; padding: 4px 0 2px; }
+  .mcard-wrap { position: relative; }
+  .mcard { width: 150px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,.18); background: #fff; }
+  .mcard svg { display: block; width: 100%; height: auto; }
+  @keyframes cardpop { 0% { transform: scale(.4) rotate(-8deg); opacity: 0; } 60% { transform: scale(1.07) rotate(1.5deg); } 100% { transform: scale(1); opacity: 1; } }
+  .mcard.pop { animation: cardpop .55s cubic-bezier(.2,.8,.2,1); }
+  .rays { position: absolute; inset: -34%; z-index: -1; background: conic-gradient(from 0deg, rgba(255,199,44,.5) 0 8deg, transparent 8deg 24deg); border-radius: 50%; animation: rayspin 9s linear infinite; opacity: .55; }
+  @keyframes rayspin { to { transform: rotate(360deg); } }
+  .draw-btn { width: 100%; height: 50px; margin-top: 14px; border: none; border-radius: 15px; cursor: pointer; font-family: inherit; font-size: 16px; font-weight: 800; letter-spacing: .1em; color: var(--ink); background: linear-gradient(180deg, var(--gold-lite), var(--gold) 60%, #F5AD00); box-shadow: 0 4px 0 #D9A400, 0 14px 30px rgba(255,199,44,.45); transition: transform .12s; }
+  .draw-btn:active { transform: translateY(2px); }
+  .draw-btn:disabled { opacity: .55; }
+  .draw-meta { text-align: center; font-size: 12px; color: var(--ink2); margin-top: 9px; line-height: 1.6; }
+  .rates { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 7px; }
+  .rate-chip { font-size: 10.5px; font-weight: 700; padding: 2px 9px; border-radius: 999px; border: 1px solid var(--sep); color: var(--ink2); }
+  .pool-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; padding: 12px 14px; }
+  .pool-cell { aspect-ratio: 3/4.2; border-radius: 8px; background: #FCFAF5; border: 1px dashed var(--sep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 8.5px; color: var(--ink3); text-align: center; padding: 2px; overflow: hidden; }
+  .pool-cell .rb { font-weight: 900; font-size: 10.5px; }
+  .pool-cell.got { border: none; font-weight: 700; }
+
   /* quiz */
   .q-progress { display: flex; gap: 6px; justify-content: center; margin: 6px 0 22px; }
   .q-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(60,60,67,.2); transition: background .3s, width .3s; }
@@ -325,8 +345,8 @@
     <symbol id="i-arches" viewBox="0 0 100 80">
       <path d="M8,78 C8,26 34,22 44,58 C46,64 47,70 47,78 M53,78 C53,26 79,22 89,58 C91,64 92,70 92,78" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
     </symbol>
-    <symbol id="i-gear" viewBox="0 0 15 16">
-      <path d="M7.5,1.6 l.45,1.7 1.75,.4 1.25,-1.25 1.35,1.35 -1.25,1.25 .4,1.75 1.7,.45 v1.9 l-1.7,.45 -.4,1.75 1.25,1.25 -1.35,1.35 -1.25,-1.25 -1.75,.4 -.45,1.7 h-1.9 l-.45,-1.7 -1.75,-.4 -1.25,1.25 -1.35,-1.35 1.25,-1.25 -.4,-1.75 -1.7,-.45 v-1.9 l1.7,-.45 .4,-1.75 -1.25,-1.25 1.35,-1.35 1.25,1.25 1.75,-.4 .45,-1.7 z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+    <symbol id="i-cards" viewBox="0 0 15 16"><rect x="4.6" y="2" width="8.4" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3" transform="rotate(7 8.8 7.5)"/><rect x="2" y="2.6" width="8.4" height="11" rx="1.6" fill="currentColor" opacity=".16"/><rect x="2" y="2.6" width="8.4" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4.6 6.2 h3.4 M4.6 8.4 h3.4" stroke="currentColor" stroke-width="1" opacity=".7"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 15 16">      <path d="M7.5,1.6 l.45,1.7 1.75,.4 1.25,-1.25 1.35,1.35 -1.25,1.25 .4,1.75 1.7,.45 v1.9 l-1.7,.45 -.4,1.75 1.25,1.25 -1.35,1.35 -1.25,-1.25 -1.75,.4 -.45,1.7 h-1.9 l-.45,-1.7 -1.75,-.4 -1.25,1.25 -1.35,-1.35 1.25,-1.25 -.4,-1.75 -1.7,-.45 v-1.9 l1.7,-.45 .4,-1.75 -1.25,-1.25 1.35,-1.35 1.25,1.25 1.75,-.4 .45,-1.7 z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
       <circle cx="7.5" cy="8.2" r="2.1" fill="none" stroke="currentColor" stroke-width="1.4"/>
     </symbol>
     <symbol id="i-pin" viewBox="0 0 15 16">
@@ -403,6 +423,7 @@
   </div>
   <div class="nav-right">
     <span class="streak-badge" id="streakBadge" style="display:none"><svg width="12" height="13" viewBox="0 0 15 16" style="color:#FFC72C"><use href="#i-flame"/></svg><span id="streakText"></span></span>
+    <button class="icon-btn" id="cardsBtn" title="麦门卡牌"><svg width="17" height="18"><use href="#i-cards"/></svg></button>
     <button class="icon-btn" id="settingsBtn" title="设置与签册"><svg width="17" height="18"><use href="#i-gear"/></svg></button>
   </div>
 </div></nav>
@@ -555,6 +576,23 @@
 <div class="sheet" id="quizSheet">
   <div class="grabber"></div>
   <div id="quizBody"></div>
+</div>
+
+<!-- 麦门卡牌 -->
+<div class="sheet" id="cardSheet">
+  <div class="grabber"></div>
+  <h2>麦门卡牌 · 每日一抽</h2>
+  <div class="hint" id="cardHint">每个号每天限抽 1 张 · 卡池每月更换 · 节日/节气出限定卡</div>
+  <div class="draw-stage">
+    <div class="mcard-wrap" id="cardWrap"><div class="mcard" id="cardBox"></div></div>
+    <button class="draw-btn" id="drawBtn">抽 今 日 卡</button>
+    <div class="draw-meta" id="drawMeta"></div>
+    <div class="rates" id="rates"></div>
+  </div>
+  <h2 style="margin-top:18px" id="poolTitle">本月卡池</h2>
+  <div class="hint" id="poolHint"></div>
+  <div class="set-card"><div class="pool-grid" id="poolGrid"></div></div>
+  <button class="sheet-done" id="cardDone">收 起</button>
 </div>
 
 <script>
@@ -821,6 +859,136 @@ function toast(msg) {
   t.textContent = msg; t.classList.add("on");
   setTimeout(() => t.classList.remove("on"), 2600);
 }
+
+/* ================= 麦门卡牌 · 每日一抽 ================= */
+const RAR = {
+  N:    { w: 52, stars: 1, bg: ["#F5F2EB", "#D9D5CB"], ink: "#6E6A63", frame: "#C9C4B8" },
+  R:    { w: 26, stars: 2, bg: ["#E8F2FF", "#B7D7F7"], ink: "#2264A8", frame: "#8FBFE8" },
+  SR:   { w: 13, stars: 3, bg: ["#F2E9FF", "#CDB2F5"], ink: "#6B2FBF", frame: "#B48BE8" },
+  SSR:  { w: 7,  stars: 4, bg: ["#FFF4CC", "#FFD75E"], ink: "#9A6A00", frame: "#F0B400" },
+  SSSR: { w: 2,  stars: 5, bg: ["#FFE4D6", "#FF9E8A"], ink: "#C21B0E", frame: "#DA291C" },
+};
+const RAR_ORDER = ["SSSR", "SSR", "SR", "R", "N"];
+const TIER_COUNTS = { N: 5, R: 4, SR: 3, SSR: 2, SSSR: 1 };
+const CARD_ITEMS = [
+  ["巨无霸", "t-beef"], ["双吉汉堡", "t-beef"], ["板烧鸡腿堡", "t-chicken"], ["麦乐鸡", "t-chicken"],
+  ["麦辣鸡腿堡", "t-spicy"], ["麦辣鸡翅", "t-spicy"], ["麦香鱼", "t-fish"], ["鳕鱼金砖堡", "t-fish"],
+  ["薯条", "t-fries"], ["薯饼", "t-fries"], ["麦旋风", "t-ice"], ["圆筒冰淇淋", "t-ice"],
+  ["草莓圣代", "t-ice"], ["苹果派", "t-ice"], ["香芋派", "t-ice"], ["热香饼", "t-ice"],
+  ["冰鲜柠檬水", "t-soda"], ["零度可乐", "t-soda"], ["焦糖玛奇朵", "t-coffee"], ["醇香拿铁", "t-coffee"],
+];
+let myCards = JSON.parse(localStorage.getItem("mcd-cards") || "[]");
+let drawRec = JSON.parse(localStorage.getItem("mcd-draw") || "null");
+let dateInfoCache = null;
+function hashStr(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+function rng(seed) { let s = seed >>> 0; return () => { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; return s / 4294967296; }; }
+function beijingDate() { return new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10); }
+function shuffleIdx(n, seed) { const r = rng(seed); const idx = Array.from({ length: n }, (_, i) => i); for (let i = n - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; } return idx; }
+function pickTier(seed, fest, ym, rar, count, offset) {
+  const r = rng(hashStr(seed)); const idx = shuffleIdx(CARD_ITEMS.length, hashStr(seed));
+  const out = [];
+  for (let k = 0; k < count; k++) {
+    const it = CARD_ITEMS[idx[(offset + k) % idx.length]];
+    out.push({ id: `${ym}|${rar}|${it[0]}`, name: fest ? `${fest}·${it[0]}` : it[0], icon: it[1], rarity: rar, special: fest, ym });
+  }
+  return out;
+}
+function monthPool(ym) {
+  const pool = []; let off = 0;
+  for (const rar of ["N", "R", "SR", "SSR", "SSSR"]) { pool.push(...pickTier("mcd-pool|" + ym + "|" + rar, "", ym, rar, TIER_COUNTS[rar], off)); off += TIER_COUNTS[rar]; }
+  return pool;
+}
+function festivalPool(fest, ym) {
+  const counts = { N: 2, R: 2, SR: 1, SSR: 1, SSSR: 1 };
+  const pool = []; let off = 0;
+  for (const rar of ["N", "R", "SR", "SSR", "SSSR"]) { pool.push(...pickTier("mcd-fest|" + fest + "|" + rar, fest, ym, rar, counts[rar], off)); off += counts[rar]; }
+  return pool;
+}
+function rollRarity() {
+  const total = RAR_ORDER.reduce((a, k) => a + RAR[k].w, 0);
+  let x = Math.random() * total;
+  for (const k of RAR_ORDER) { x -= RAR[k].w; if (x <= 0) return k; }
+  return "N";
+}
+function todayPool() {
+  const t = beijingDate(), ym = t.slice(0, 7);
+  const fest = dateInfoCache && dateInfoCache.date === t ? (dateInfoCache.festival || dateInfoCache.term || "") : "";
+  return { fest, pool: [...(fest ? festivalPool(fest, ym) : []), ...monthPool(ym)] };
+}
+function cardSVG(card) {
+  const R = RAR[card.rarity], gid = "cg" + (hashStr(card.id) % 99999);
+  const isTop = card.rarity === "SSSR";
+  return `<svg viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${R.bg[0]}"/><stop offset="1" stop-color="${R.bg[1]}"/></linearGradient></defs>
+  <rect width="150" height="200" rx="14" fill="url(#${gid})"/>
+  <rect x="5" y="5" width="140" height="190" rx="10" fill="none" stroke="${R.frame}" stroke-width="${isTop ? 3 : 1.5}" opacity=".85"/>
+  <rect x="0" y="0" width="150" height="30" rx="14" fill="${R.ink}" opacity=".1"/>
+  <text x="75" y="21" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="900" font-size="13" fill="${R.ink}">${card.rarity}${"★".repeat(R.stars)}</text>
+  <use href="#${card.icon}" x="47" y="46" width="56" height="56" style="color:${R.ink}"/>
+  <text x="75" y="138" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="800" font-size="${card.name.length > 8 ? 11 : 13}" fill="#27251F">${card.name}</text>
+  <text x="75" y="160" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="600" font-size="8.5" fill="${R.ink}" opacity=".75">${card.special ? card.special + " · 限定" : card.ym + " 常驻"}</text>
+  <text x="75" y="186" text-anchor="middle" font-family="Songti SC,serif" font-weight="900" font-size="9" fill="${R.ink}" opacity=".6">麥 門 卡 牌</text>
+</svg>`;
+}
+function cardBackSVG() {
+  return `<svg viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg">
+  <defs><linearGradient id="cbk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DA291C"/><stop offset="1" stop-color="#A31409"/></linearGradient></defs>
+  <rect width="150" height="200" rx="14" fill="url(#cbk)"/>
+  <rect x="6" y="6" width="138" height="188" rx="10" fill="none" stroke="#FFC72C" stroke-width="1.5" opacity=".8"/>
+  <use href="#i-arches" x="45" y="52" width="60" height="48" style="color:#FFC72C" opacity=".9"/>
+  <text x="75" y="140" text-anchor="middle" font-family="Songti SC,serif" font-weight="900" font-size="34" fill="#FFC72C">？</text>
+  <text x="75" y="176" text-anchor="middle" font-family="Songti SC,serif" font-weight="900" font-size="9" fill="#FFF4D6" opacity=".8">麥 門 卡 牌</text>
+</svg>`;
+}
+function renderCardView() {
+  const t = beijingDate();
+  const drawn = drawRec && drawRec.date === t ? drawRec : null;
+  $("cardBox").innerHTML = drawn ? cardSVG(drawn) : cardBackSVG();
+  if (drawn) { $("cardBox").classList.remove("pop"); void $("cardBox").offsetWidth; $("cardBox").classList.add("pop"); }
+  $("cardWrap").querySelector(".rays")?.remove();
+  if (drawn && (drawn.rarity === "SSSR" || drawn.rarity === "SSR")) { const r = document.createElement("div"); r.className = "rays"; $("cardWrap").prepend(r); }
+  $("drawBtn").disabled = !!drawn;
+  $("drawBtn").textContent = drawn ? "今 日 已 抽" : "抽 今 日 卡";
+  $("drawMeta").textContent = drawn
+    ? `${drawn.rarity} ·「${drawn.name}」已收下${myCards.some(c => c.name === drawn.name) ? "" : " · 新收录！"} · 明天 0 点再来`
+    : "今天还没抽 · 每个号每天限 1 张，明天 0 点刷新";
+  $("rates").innerHTML = RAR_ORDER.slice().reverse().map(k => `<span class="rate-chip">${k} ${RAR[k].w}%</span>`).join("");
+  const { fest, pool } = todayPool();
+  const got = new Set(myCards.map(c => c.name));
+  $("poolHint").textContent = `${t.slice(0, 7)} 卡池 · 共 ${pool.length} 张${fest ? ` · 本期含限定「${fest}」` : ""} · 已集 ${got.size} 张`;
+  $("poolGrid").innerHTML = pool.map(c => {
+    const R = RAR[c.rarity], has = got.has(c.name);
+    return `<div class="pool-cell${has ? " got" : ""}"${has ? ` style="background:linear-gradient(140deg,${R.bg[0]},${R.bg[1]});color:${R.ink}"` : ""}><span class="rb"${has ? ` style="color:${R.ink}"` : ""}>${c.rarity}</span><span>${has ? c.name : "？"}</span></div>`;
+  }).join("");
+}
+async function loadDateInfo() {
+  const t = beijingDate();
+  try { dateInfoCache = JSON.parse(localStorage.getItem("mcd-di") || "null"); } catch { dateInfoCache = null; }
+  if (dateInfoCache && dateInfoCache.date === t) return;
+  try {
+    const r = await fetch("/api/dateinfo"); dateInfoCache = await r.json();
+    localStorage.setItem("mcd-di", JSON.stringify(dateInfoCache));
+  } catch { /* 离线兜底：当作无节日 */ dateInfoCache = { date: t, term: null, festival: null }; }
+}
+$("cardsBtn").onclick = async () => { await loadDateInfo(); renderCardView(); openSheet($("cardSheet")); };
+$("cardDone").onclick = closeSheets;
+$("drawBtn").onclick = () => {
+  const t = beijingDate();
+  if (drawRec && drawRec.date === t) return;
+  const { fest, pool } = todayPool();
+  const rar = rollRarity();
+  const tier = pool.filter(c => c.rarity === rar);
+  const card = tier[Math.floor(Math.random() * tier.length)];
+  drawRec = { date: t, ...card };
+  localStorage.setItem("mcd-draw", JSON.stringify(drawRec));
+  const isNew = !myCards.some(c => c.name === card.name);
+  if (isNew) { myCards.push({ name: card.name, rarity: card.rarity, special: card.special, ym: card.ym, ts: Date.now() }); localStorage.setItem("mcd-cards", JSON.stringify(myCards)); }
+  buzz(card.rarity === "SSSR" ? [60, 60, 60, 60, 120] : [30, 50, 30]);
+  toast(isNew
+    ? (card.rarity === "SSSR" ? "🎉 SSSR！！「" + card.name + "」传说收录！" : `新收录：${card.rarity} ·「${card.name}」`)
+    : `抽到 ${card.rarity} ·「${card.name}」（已收录过）`);
+  renderCardView();
+};
 
 /* ================= 求签 ================= */
 function setStep(n) { [1,2,3].forEach(i => $("st"+i).className = "st" + (i === n ? " cur" : i < n ? " done" : "")); }
