@@ -1,7 +1,9 @@
 // 麦门今日签 Web 服务端：静态页 + API（Token 只在服务端，前端不暴露）
 // 启动：node web/server.js  [默认 http://localhost:8787]
 import { createServer } from "node:http";
-import { readFileSync, existsSync, writeFileSync } from "node:fs";
+import { createServer as createHttpsServer } from "node:https";
+import { execSync } from "node:child_process";
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from "node:fs";
 import { join, dirname, extname, resolve } from "node:path";
 import { homedir, networkInterfaces } from "node:os";
 import { fileURLToPath } from "node:url";
@@ -43,10 +45,24 @@ async function readBody(req) {
   return JSON.parse(raw || "{}");
 }
 
-const server = createServer(async (req, res) => {
+// 网络定位兜底缓存（同 NAT 出口设备共用，10 分钟）
+let ipCache = null, ipCacheAt = 0;
+
+const handler = async (req, res) => {
   const json = (code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
   try {
     if (req.method === "GET") return serveStatic(req, res);
+
+    // 网络定位兜底（浏览器无 geolocation API 时，如 http 内网环境）：用出口公网 IP 粗定位
+    if (req.url === "/api/iploc" && req.method === "POST") {
+      if (ipCache && Date.now() - ipCacheAt < 600000) return json(200, ipCache);
+      const r = await fetch("http://ip-api.com/json/?lang=zh-CN&fields=status,city,regionName,lat,lon");
+      const j = await r.json();
+      if (j.status !== "success") return json(502, { error: "网络定位失败" });
+      ipCache = { city: String(j.city || j.regionName || "").replace(/市$/, ""), raw: j.city || j.regionName, lat: j.lat, lon: j.lon };
+      ipCacheAt = Date.now();
+      return json(200, ipCache);
+    }
 
     if (req.url === "/api/recommend" && req.method === "POST") {
       const body = await readBody(req);
@@ -99,13 +115,34 @@ const server = createServer(async (req, res) => {
   } catch (e) {
     json(500, { error: e.message });
   }
+};
+
+// —— 自签名证书（首次启动自动生成）：内网 HTTPS 是定位/摇一摇权限的前提 ——
+const CERT_DIR = join(__dirname, "cert");
+function ensureCert() {
+  const key = join(CERT_DIR, "key.pem"), crt = join(CERT_DIR, "cert.pem");
+  if (existsSync(key) && existsSync(crt)) return { key: readFileSync(key), cert: readFileSync(crt) };
+  mkdirSync(CERT_DIR, { recursive: true });
+  console.log("首次启动：生成自签名证书（手机访问 https 地址时需在浏览器里点\"继续访问\"）…");
+  execSync(`openssl req -x509 -newkey rsa:2048 -nodes -days 3650 -subj "/CN=mcdaily.local" -keyout "${key}" -out "${crt}"`);
+  return { key: readFileSync(key), cert: readFileSync(crt) };
+}
+
+const HTTPS_PORT = process.env.HTTPS_PORT ?? 8788;
+const lanIps = (() => { try {
+  return Object.values(networkInterfaces()).flat().filter(n => n && n.family === "IPv4" && !n.internal).map(n => n.address);
+} catch { return []; } })();
+
+createServer(handler).listen(PORT, () => {
+  console.log(`麦门今日签 Web 已启动: http://localhost:${PORT}`);
+  for (const ip of lanIps) console.log(`内网可访问: http://${ip}:${PORT}  （无定位/摇一摇权限）`);
 });
 
-server.listen(PORT, () => {
-  console.log(`麦门今日签 Web 已启动: http://localhost:${PORT}`);
-  try {
-    const ips = Object.values(networkInterfaces()).flat()
-      .filter(n => n && n.family === "IPv4" && !n.internal).map(n => n.address);
-    for (const ip of ips) console.log(`内网可访问: http://${ip}:${PORT}  （手机连同一 Wi-Fi 打开）`);
-  } catch { /* ignore */ }
-});
+try {
+  createHttpsServer(ensureCert(), handler).listen(HTTPS_PORT, () => {
+    console.log(`内网 HTTPS（手机请用这个，才有定位/摇一摇权限）:`);
+    for (const ip of lanIps) console.log(`  https://${ip}:${HTTPS_PORT}  （首次打开点\"高级→继续访问\"）`);
+  });
+} catch (e) {
+  console.warn("HTTPS 未启用:", e.message);
+}

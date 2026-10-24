@@ -99,6 +99,7 @@
   .go:disabled { opacity: .55; }
   .go-hint { text-align: center; font-size: 12px; color: var(--ink3); margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
   .go-hint svg { color: var(--ink3); }
+  .shake-on { border: none; background: none; padding: 0; color: var(--red); font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer; font-family: inherit; }
 
   .loading { display: none; text-align: center; padding: 34px 0 10px; color: var(--ink2); font-size: 14px; }
   .loading.on { display: block; }
@@ -362,7 +363,7 @@
 
 <nav><div class="nav-in">
   <div class="nav-logo">
-    <svg width="30" height="22"><use href="#i-fries"/></svg>
+    <svg width="34" height="27" viewBox="0 0 100 80" style="color:#FFC72C;filter:drop-shadow(0 1px 3px rgba(120,10,5,.35))"><use href="#i-arches"/></svg>
     <span class="nav-title" style="display:none"></span>
   </div>
   <div class="nav-right">
@@ -404,7 +405,7 @@
   </div>
 
   <button class="go" id="go"><svg width="34" height="40" viewBox="0 0 60 70" style="flex-shrink:0"><use href="#i-cup"/></svg>抽 今 日 签</button>
-  <div class="go-hint" id="goHint"><svg width="13" height="13" viewBox="0 0 16 16"><use href="#i-shake"/></svg>每天一签 · 签到明天就变 · 手机摇一摇直接出签</div>
+  <div class="go-hint" id="goHint"><svg width="13" height="13" viewBox="0 0 16 16"><use href="#i-shake"/></svg>每天一签 · 签到明天就变 · <button class="shake-on" id="shakeOn">开启摇一摇</button></div>
   <div class="loading" id="loading">
     <svg class="cup" width="56" height="66" viewBox="0 0 60 70"><use href="#i-cup"/></svg>
     正在摇签筒 — 结合天气、节气与实时菜单…
@@ -625,15 +626,23 @@ function renderQuiz() {
 }
 
 /* ================= 摇一摇求签 ================= */
-let shakePermAsked = false;
-function requestShakePerm() {
-  if (shakePermAsked) return;
-  shakePermAsked = true;
+// iOS 动作权限 + 震动反馈：两者都需要安全上下文（https），http 内网下 iOS 会静默拒绝
+const buzz = p => { try { navigator.vibrate && navigator.vibrate(p); } catch { /* 不支持就算了 */ } };
+async function requestShakePerm() {
   try {
-    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function")
-      DeviceMotionEvent.requestPermission().catch(() => {});
-  } catch { /* 不支持就算了 */ }
+    if (typeof DeviceMotionEvent !== "undefined" && typeof DeviceMotionEvent.requestPermission === "function") {
+      return (await DeviceMotionEvent.requestPermission()) === "granted";
+    }
+    return typeof DeviceMotionEvent !== "undefined";   // Android / 桌面：无需授权
+  } catch { return false; }
 }
+$("shakeOn").onclick = async () => {
+  const ok = await requestShakePerm();
+  buzz(ok ? [30, 40, 30] : 80);
+  const el = $("shakeOn");
+  if (ok) { el.textContent = "摇一摇已开启 ✓ 摇动手机直接出签"; el.style.pointerEvents = "none"; el.style.color = "var(--green)"; }
+  else { el.textContent = "未获授权，点此重试"; toast("当前环境拿不到动作权限——请用 https 地址打开，或直接点按钮抽签"); }
+};
 (function initShake() {
   if (typeof DeviceMotionEvent === "undefined") return;
   let peaks = 0, winStart = 0, lastFire = 0;
@@ -647,6 +656,7 @@ function requestShakePerm() {
     if (Math.abs(mag - 9.8) > 11) peaks++;       // 剧烈晃动一次记一峰
     if (peaks >= 3) {
       peaks = 0; lastFire = now;
+      buzz(60);
       document.body.classList.remove("shaking"); void document.body.offsetWidth;
       document.body.classList.add("shaking");
       $("go").click();
@@ -655,9 +665,28 @@ function requestShakePerm() {
 })();
 
 /* ================= 定位 ================= */
+// 说明：geolocation / 动作传感器只存在于安全上下文（https 或 localhost）。
+// 用 http 内网地址打开时走 /api/iploc 网络粗定位兜底；想要 GPS 精确定位请用启动日志里的 https 地址。
+async function ipLoc(btn, st) {
+  btn.classList.add("busy"); btn.textContent = "正在网络定位…";
+  try {
+    const r = await fetch("/api/iploc", { method: "POST" });
+    const j = await r.json();
+    if (!j.city) throw new Error(j.error || "iploc fail");
+    $("city").value = j.city; $("kw").value = "";
+    st.className = "loc-status ok";
+    st.textContent = `已网络定位：${j.raw || j.city}（市级粗定位，可手动修正地标）`;
+    $("manual").classList.add("show");
+    btn.classList.remove("busy"); btn.textContent = "📍 重新定位";
+  } catch (e) {
+    btn.classList.remove("busy"); btn.textContent = "📍 使用我的位置";
+    st.className = "loc-status err"; st.textContent = "网络定位失败，请手动填写城市与地标";
+    $("manual").classList.add("show"); $("city").focus();
+  }
+}
 $("locBtn").onclick = () => {
   const btn = $("locBtn"), st = $("locStatus");
-  if (!navigator.geolocation) return fallback("你的浏览器不支持定位");
+  if (!navigator.geolocation) return ipLoc(btn, st);   // 非安全上下文（http 内网）：浏览器不提供定位 API
   btn.classList.add("busy"); btn.textContent = "正在请求定位权限…";
   navigator.geolocation.getCurrentPosition(async pos => {
     try {
@@ -671,13 +700,9 @@ $("locBtn").onclick = () => {
       st.className = "loc-status ok";
       st.textContent = `已定位：${j.city || city}${kw && kw !== city ? " · " + kw : ""}`;
       btn.classList.remove("busy"); btn.textContent = "📍 重新定位";
-    } catch { fallback("定位解析失败"); }
-  }, err => fallback(err.code === 1 ? "你拒绝了定位授权" : "定位失败"), { timeout: 8000 });
-  function fallback(msg) {
-    btn.classList.remove("busy"); btn.textContent = "📍 使用我的位置";
-    st.className = "loc-status err"; st.textContent = msg + "，请手动填写城市与地标";
-    $("manual").classList.add("show"); $("city").focus();
-  }
+      buzz(30);
+    } catch { ipLoc(btn, st); }
+  }, () => ipLoc(btn, st), { timeout: 8000 });
 };
 
 /* ================= 设置 + 签册 ================= */
@@ -824,6 +849,7 @@ function renderSign(j, mbti) {
   $("alts").innerHTML = `<div class="alts-t">备选签位</div>` +
     j.alternatives.map(a => `<div class="alt"><span><span class="g">${a.grade}</span>${a.product}</span><span class="p">¥${a.price}</span></div>`).join("");
   $("signCard").classList.add("show");
+  buzz([30, 50, 30]);
   typeFortune(s.fortune);
   setTimeout(() => $("signCard").scrollIntoView({ behavior: "smooth", block: "start" }), 60);
 }
