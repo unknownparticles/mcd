@@ -360,7 +360,8 @@ const QUIZ = [
   { q:"前面排队 10 分钟，隔壁店走 10 分钟，你？", opts:[
     ["就排这家，计划不变","J · 按既定方案"],["换一家看看，说不定有惊喜","P · 随机应变"]] },
 ];
-const DIMS = ["EI","SN","TF","TF","JP","JP"];
+const DIMS = ["EI","SN","TF","JP","TF","JP"]; // 每题对应维度（第4题为JP主判，5、6为TF/JP加权补充）
+const PAIRS = { EI:["E","I"], SN:["S","N"], TF:["T","F"], JP:["J","P"] };
 
 /* ================= 本地状态 ================= */
 const settings = Object.assign({ budget: "", claim: true, mbti: "" }, JSON.parse(localStorage.getItem("mcd-sign-set") || "{}"));
@@ -416,13 +417,12 @@ function renderQuiz() {
   } else {
     const pick = {};
     for (const dim of ["EI","SN","TF","JP"]) {
+      const [p1, p2] = PAIRS[dim];
       const votes = quizAns.filter(a => a.dim === dim);
-      const last = votes[votes.length - 1];
-      const a = last.side[0], b = last.side[1];
-      pick[dim] = votes.filter(v => v.side === a).length >= votes.filter(v => v.side === b).length ? a : b;
+      pick[dim] = votes.filter(v => v.side === p1).length >= votes.filter(v => v.side === p2).length ? p1 : p2;
     }
     const type = pick.EI + pick.SN + pick.TF + pick.JP;
-    const whys = quizAns.filter(a => a.side.includes(pick[a.dim])).map(a => a.why);
+    const whys = quizAns.filter(a => a.side === pick[a.dim]).map(a => a.why);
     const p = PERSONA[type];
     body.innerHTML = `
       <h2>你的命格</h2><div class="hint">根据 6 道题的倾向计算</div>
