@@ -832,21 +832,16 @@ function renderSign(j, mbti) {
 // 全部资源为内联 SVG（副本存于 /assets/share/*.svg）：背景纸纹+金拱水印+祥云，前景：拱门徽标/麥印章/灯笼/薯条
 const shareRes = {
   bg: (w, h) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
-  <defs><radialGradient id="glow" cx="50%" cy="8%" r="95%">
-    <stop offset="0%" stop-color="#FFFDF6"/><stop offset="45%" stop-color="#FFF9EF"/><stop offset="100%" stop-color="#F7E9CE"/>
-  </radialGradient></defs>
-  <rect width="${w}" height="${h}" fill="url(#glow)"/>
-  <text x="${w / 2}" y="1080" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-weight="700" font-size="420" fill="#F5E7C8">M</text>
-  <g fill="#F3E4C4" opacity=".8">
-    <path transform="translate(66,300)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
-    <path transform="translate(${w - 168},478) scale(.8)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
-    <path transform="translate(82,790) scale(.9)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
-    <path transform="translate(${w - 158},960)" d="M18 34 a10 10 0 0 1 8-17 a13 13 0 0 1 25 2 a8 8 0 0 1 7 15 z"/>
-  </g>
+  <rect width="${w}" height="${h}" fill="#FFFFFF"/>
+  <circle cx="${w + 8}" cy="330" r="220" fill="none" stroke="#FFC72C" stroke-width="72"/>
+  <circle cx="-8" cy="${h - 400}" r="170" fill="none" stroke="#FFEBB0" stroke-width="56"/>
+  <circle cx="${w - 36}" cy="640" r="7" fill="#FFC72C" opacity=".85"/>
+  <circle cx="42" cy="900" r="6" fill="#FFC72C" opacity=".65"/>
+  <circle cx="${w - 66}" cy="1160" r="6" fill="#DA291C" opacity=".5"/>
 </svg>`,
   arches: `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="48" viewBox="0 0 100 80"><path d="M12 78 V40 Q12 8 31 8 Q47 8 50 38 Q53 8 69 8 Q88 8 88 40 V78 H70 V44 Q70 27 62 27 Q56 27 54 46 L52.5 78 H47.5 L46 46 Q44 27 38 27 Q30 27 30 44 V78 Z" fill="#FFC72C"/></svg>`,
   seal: `<svg xmlns="http://www.w3.org/2000/svg" width="88" height="88" viewBox="0 0 90 90"><rect x="3" y="3" width="84" height="84" rx="16" fill="#DA291C"/><rect x="10" y="10" width="70" height="70" rx="11" fill="none" stroke="#FFD9D4" stroke-width="2" opacity=".65"/><text x="45" y="63" text-anchor="middle" font-family="'Songti SC','STSong','SimSun',serif" font-weight="900" font-size="48" fill="#FFF3E0">麥</text></svg>`,
-  lantern: `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="76" viewBox="0 0 56 76"><line x1="28" y1="0" x2="28" y2="10" stroke="#B8860B" stroke-width="2.5"/><rect x="21" y="8" width="14" height="9" rx="2.5" fill="#FFC72C"/><ellipse cx="28" cy="38" rx="21" ry="23" fill="#DA291C"/><path d="M9 30 h38 M7.5 38 h41 M9 46 h38" stroke="#FFC72C" stroke-width="1.6" opacity=".55"/><rect x="21" y="58" width="14" height="8" rx="2.5" fill="#FFC72C"/><line x1="28" y1="66" x2="28" y2="74" stroke="#B8860B" stroke-width="2"/></svg>`,
+  lantern: `<svg xmlns="http://www.w3.org/2000/svg" width="56" height="76" viewBox="0 0 56 76"><line x1="28" y1="0" x2="28" y2="10" stroke="#DA291C" stroke-width="2.5"/><rect x="21" y="8" width="14" height="9" rx="2.5" fill="#FFC72C"/><ellipse cx="28" cy="38" rx="21" ry="23" fill="#DA291C"/><path d="M9 30 h38 M7.5 38 h41 M9 46 h38" stroke="#FFC72C" stroke-width="1.6" opacity=".55"/><rect x="21" y="58" width="14" height="8" rx="2.5" fill="#FFC72C"/><line x1="28" y1="66" x2="28" y2="74" stroke="#DA291C" stroke-width="2"/></svg>`,
   fries: `<svg xmlns="http://www.w3.org/2000/svg" width="126" height="100" viewBox="0 0 126 100">
   <g stroke="#E0A423" stroke-width="2.5" stroke-linejoin="round">
     <rect x="34" y="8" width="13" height="52" rx="4" fill="#FFC72C" transform="rotate(-10 40 34)"/>
@@ -897,97 +892,109 @@ $("shareBtn").onclick = async () => {
     cv.width = W; cv.height = MAXH;
     const x = cv.getContext("2d");
     const round = (px, py, w, h, r) => { x.beginPath(); x.moveTo(px + r, py); x.arcTo(px + w, py, px + w, py + h, r); x.arcTo(px + w, py + h, px, py + h, r); x.arcTo(px, py + h, px, py, r); x.arcTo(px, py, px + w, py, r); x.closePath(); };
-    // 背景：SVG 纸纹渐变 + 金拱水印 + 祥云（降级为纯色）
+    // —— 麦当劳官方品牌色板：Red #DA291C / Golden Yellow #FFC72C / Near Black #27251F / White ——
+    const INK = "#27251F", RED = "#DA291C", GOLD = "#FFC72C", SUB = "#8E8A83", BODY = "#4A463F", TINT = "#FFF6D6";
+    const FT = (w, s) => `${w} ${s}px -apple-system, "PingFang SC", "SF Pro Rounded", sans-serif`;
+    // 背景：白底 + 金拱圈弧裁切（Archery 风），降级纯白
     if (bgImg) x.drawImage(bgImg, 0, 0, W, MAXH);
-    else { x.fillStyle = "#FFF9EF"; x.fillRect(0, 0, W, MAXH); }
-    // 顶部红头（含金线）
-    x.fillStyle = "#DA291C"; round(40, 40, W - 80, 148, 14); x.fill();
-    x.strokeStyle = "rgba(255,199,44,.65)"; x.lineWidth = 2; round(50, 50, W - 100, 128, 10); x.stroke();
-    // 前景：红头金拱徽标水印 + 右上角麥印章
-    if (archImg) { x.globalAlpha = .22; x.drawImage(archImg, W / 2 - 30, 58); x.globalAlpha = 1; }
-    if (sealImg) {
-      x.save(); x.translate(W - 98, 86); x.rotate(9 * Math.PI / 180);
-      x.globalAlpha = .92; x.drawImage(sealImg, -44, -44); x.restore(); x.globalAlpha = 1;
+    else { x.fillStyle = "#FFFFFF"; x.fillRect(0, 0, W, MAXH); }
+    x.textAlign = "center";
+    // 顶部：金色拱门标志
+    if (archImg) x.drawImage(archImg, W / 2 - 39, 54, 78, 62);
+    // 标题：近黑粗体 + 金黄荧光笔高亮条
+    x.fillStyle = GOLD; round(W / 2 - 168, 138, 336, 58, 14); x.fill();
+    x.fillStyle = INK; x.font = FT(900, 46); x.fillText("麦门今日签", W / 2, 179);
+    // 红胶囊：全国同签 · 日期 · 节气
+    const pillTxt = `全国同签 · ${j.date}${j.term ? " · " + j.term : ""}${j.festival ? " · " + j.festival : ""}`;
+    x.font = FT(600, 21); const pw = x.measureText(pillTxt).width + 52;
+    x.fillStyle = RED; round(W / 2 - pw / 2, 216, pw, 44, 22); x.fill();
+    x.fillStyle = "#FFFFFF"; x.fillText(pillTxt, W / 2, 245);
+    // 前景：麥印章（右上白底盖章）
+    if (sealImg) { x.save(); x.translate(W - 104, 96); x.rotate(9 * Math.PI / 180); x.globalAlpha = .94; x.drawImage(sealImg, -44, -44); x.restore(); x.globalAlpha = 1; }
+    var yNext;
+    if (s.limited) {
+      x.font = FT(800, 22);
+      const ltxt = `🏮 ${s.limited}限定签`, lw = x.measureText(ltxt).width + 48;
+      x.fillStyle = GOLD; round(W / 2 - lw / 2, 286, lw, 42, 21); x.fill();
+      x.fillStyle = INK; x.fillText(ltxt, W / 2, 314);
+      if (lanImg) { x.drawImage(lanImg, 52, 278); x.drawImage(lanImg, W - 108, 278); }
+      yNext = 372;
+    } else yNext = 326;
+    // 人格：MBTI 红 + 人格名近黑
+    x.font = FT(700, 27);
+    const t2 = " · " + j.persona, w1 = x.measureText(mbti).width, w2 = x.measureText(t2).width;
+    x.textAlign = "left";
+    x.fillStyle = RED; x.fillText(mbti, W / 2 - (w1 + w2) / 2, yNext);
+    x.fillStyle = INK; x.fillText(t2, W / 2 - (w1 + w2) / 2 + w1, yNext);
+    x.textAlign = "center";
+    yNext += 62;
+    // 今日运势：浅黄圆角块
+    x.fillStyle = TINT; round(56, yNext - 18, W - 112, 176, 26); x.fill();
+    x.fillStyle = SUB; x.font = FT(600, 22); x.fillText("今 日 运 势", W / 2 - 154, yNext + 24);
+    x.fillStyle = RED; x.font = FT(800, 88); x.fillText(String(fortune), W / 2 - 44, yNext + 102);
+    x.fillStyle = GOLD; x.font = FT(700, 36); x.fillText("★".repeat(stars) + "☆".repeat(5 - stars), W / 2 + 140, yNext + 68);
+    x.fillStyle = INK; x.font = FT(700, 25); x.fillText(level, W / 2 + 140, yNext + 110);
+    yNext += 204;
+    // 签位：红胶囊
+    x.font = FT(800, 25);
+    const gw = x.measureText(s.grade).width + 52;
+    x.fillStyle = RED; round(W / 2 - gw / 2, yNext - 6, gw, 46, 23); x.fill();
+    x.fillStyle = "#FFFFFF"; x.fillText(s.grade, W / 2, yNext + 25); yNext += 84;
+    // 商品名
+    x.fillStyle = INK; x.font = FT(800, 44);
+    yNext += wrapText(x, s.product, W / 2, yNext, W - 150, 56) * 56; yNext += 12;
+    // 价格：品牌红大价签 + 原价灰删 + 立省金黄小签
+    x.fillStyle = RED; x.font = FT(800, 64);
+    x.fillText(`¥${s.price}`, W / 2, yNext + 52); yNext += 74;
+    if (s.origPrice > s.price) {
+      x.font = FT(400, 24);
+      const otxt = `原价 ¥${s.origPrice}`, owd = x.measureText(otxt).width;
+      const stxt = `立省 ¥${(s.origPrice - s.price).toFixed(1)}`, sw = x.measureText(stxt).width + 36;
+      const sx = W / 2 - (owd + 20 + sw) / 2;
+      x.fillStyle = SUB; x.fillText(otxt, sx + owd / 2, yNext + 6);
+      x.strokeStyle = SUB; x.lineWidth = 2; x.beginPath(); x.moveTo(sx, yNext - 2); x.lineTo(sx + owd, yNext - 2); x.stroke();
+      x.fillStyle = GOLD; round(sx + owd + 20, yNext - 16, sw, 36, 18); x.fill();
+      x.fillStyle = INK; x.font = FT(700, 21); x.fillText(stxt, sx + owd + 20 + sw / 2, yNext + 8);
+      yNext += 50;
     }
-    x.fillStyle = "#FFC72C"; x.textAlign = "center";
-  x.font = "800 50px -apple-system, PingFang SC, sans-serif";
-  x.fillText("麦 门 今 日 签", W / 2, 108);
-  x.fillStyle = "rgba(255,255,255,.92)"; x.font = "600 23px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`${j.date} · ${j.term ?? ""}${j.festival ? " · " + j.festival : ""}`, W / 2, 150);
-  if (s.limited) {
-    x.fillStyle = "#B8860B"; round(W / 2 - 92, 206, 184, 40, 20); x.fill();
-    x.fillStyle = "#FFF9EF"; x.font = "700 22px -apple-system, PingFang SC, sans-serif";
-    x.fillText(`🏮 ${s.limited}限定签`, W / 2, 233);
-    // 前景：限定签两侧挂灯笼
-    if (lanImg) { x.drawImage(lanImg, 48, 198); x.drawImage(lanImg, W - 104, 198); }
-    var yNext = 272;
-  } else var yNext = 240;
-  // 人格
-  x.fillStyle = "#8A5A00"; x.font = "700 28px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`${mbti} · ${j.persona}，全国同签`, W / 2, yNext); yNext += 64;
-  // —— 今日运势区块 ——
-  x.fillStyle = "#FBF1DC"; round(56, yNext - 18, W - 112, 168, 16); x.fill();
-  x.strokeStyle = "#E8C88A"; x.lineWidth = 1.5; round(56, yNext - 18, W - 112, 168, 16); x.stroke();
-  x.fillStyle = "#B8860B"; x.font = "600 22px -apple-system, PingFang SC, sans-serif";
-  x.fillText("今 日 运 势", W / 2 - 150, yNext + 28);
-  x.fillStyle = "#DA291C"; x.font = "800 76px Georgia, serif";
-  x.fillText(String(fortune), W / 2 - 40, yNext + 92);
-  x.fillStyle = "#E8A317"; x.font = "700 34px -apple-system, PingFang SC, sans-serif";
-  x.fillText("★".repeat(stars) + "☆".repeat(5 - stars), W / 2 + 120, yNext + 68);
-  x.fillStyle = "#B8860B"; x.font = "700 24px -apple-system, PingFang SC, sans-serif";
-  x.fillText(level, W / 2 + 120, yNext + 104);
-  yNext += 196;
-  // 签位 + 商品 + 价格
-  x.fillStyle = "#C77F0A"; x.font = "800 32px -apple-system, PingFang SC, sans-serif";
-  x.fillText(s.grade, W / 2, yNext); yNext += 56;
-  x.fillStyle = "#1D1D1F"; x.font = "800 42px -apple-system, PingFang SC, sans-serif";
-  yNext += wrapText(x, s.product, W / 2, yNext, W - 150, 54) * 54; yNext += 10;
-  x.fillStyle = "#DA291C"; x.font = "800 60px -apple-system, PingFang SC, sans-serif";
-  x.fillText(`¥${s.price}`, W / 2, yNext + 48); yNext += 66;
-  if (s.origPrice > s.price) {
-    x.fillStyle = "#AEAEB2"; x.font = "400 25px -apple-system, PingFang SC, sans-serif";
-    x.fillText(`原价 ¥${s.origPrice} · 立省 ¥${(s.origPrice - s.price).toFixed(1)}`, W / 2, yNext + 8); yNext += 44;
-  }
-  // 签文
-  x.fillStyle = "#6B4A12"; x.font = "500 29px -apple-system, PingFang SC, sans-serif";
-  yNext += 16 + wrapText(x, `「${s.fortune}」`, W / 2, yNext + 24, W - 150, 44) * 44;
-  // —— 为什么点吃这个 ——
-  dashedLine(x, 70, yNext += 26, W - 70); yNext += 48;
-  x.fillStyle = "#1D1D1F"; x.font = "800 28px -apple-system, PingFang SC, sans-serif";
-  x.fillText("为什么点吃这个 🤔", W / 2, yNext); yNext += 46;
-  x.font = "400 24px -apple-system, PingFang SC, sans-serif";
-  for (const rsn of (s.reasons ?? []).slice(0, 3)) {
-    x.fillStyle = "#E8A317"; x.fillText("✓", 108, yNext);
-    x.fillStyle = "#55524C";
-    yNext += wrapText(x, rsn, W / 2 + 12, yNext, W - 250, 36, 12) * 36 + 10;
-  }
-  // —— 运势加成（先排文本，再按实际高度描框）——
-  yNext += 14;
-  const boxTop = yNext;
-  x.fillStyle = "#B8860B"; x.font = "800 25px -apple-system, PingFang SC, sans-serif";
-  x.fillText("⚡ 运势加成玩法", W / 2, boxTop + 38);
-  x.font = "400 23px -apple-system, PingFang SC, sans-serif"; x.fillStyle = "#6B4A12";
-  let by = boxTop + 76;
-  for (const b of boosts) { by += wrapText(x, "· " + b, W / 2, by, W - 170, 34, 12) * 34 + 6; }
-  x.strokeStyle = "#E8A317"; x.setLineDash([8, 7]); x.lineWidth = 2;
-  round(56, boxTop, W - 112, by - boxTop + 12, 14); x.stroke(); x.setLineDash([]);
-  // footer（动态位置）+ 高度裁切
-  const footY = by + 52;
-  x.fillStyle = "#1D1D1F"; x.font = "700 26px -apple-system, PingFang SC, sans-serif";
-  x.fillText("明天，签就换了。今天全国都吃这个。", W / 2, footY);
-  x.fillStyle = "#AEAEB2"; x.font = "400 21px -apple-system, PingFang SC, sans-serif";
-  x.fillText("github.com/unknownparticles/mcd", W / 2, footY + 42);
-  const finalH = footY + 196;
-  const out = document.createElement("canvas");
-  out.width = W; out.height = finalH;
-  const ox = out.getContext("2d");
-  if (bgImg) ox.drawImage(bgImg, 0, 0, W, finalH);
-  else { ox.fillStyle = "#FFF9EF"; ox.fillRect(0, 0, W, finalH); }
-  ox.drawImage(cv, 0, 0);
-  // 前景：底部品牌薯条插画 + 双边框
-  if (fryImg) ox.drawImage(fryImg, W / 2 - 63, footY + 92);
-  ox.strokeStyle = "#E8C88A"; ox.lineWidth = 3; ox.strokeRect(16, 16, W - 32, finalH - 32);
-  ox.lineWidth = 1; ox.strokeRect(26, 26, W - 52, finalH - 52);
+    // 签文
+    x.fillStyle = INK; x.font = FT(500, 29);
+    yNext += 14 + wrapText(x, `「${s.fortune}」`, W / 2, yNext + 26, W - 150, 44) * 44;
+    // 金黄虚线分隔
+    x.strokeStyle = GOLD; x.setLineDash([10, 10]); x.lineWidth = 2.5;
+    x.beginPath(); x.moveTo(84, yNext + 26); x.lineTo(W - 84, yNext + 26); x.stroke(); x.setLineDash([]);
+    yNext += 64;
+    // 为什么点吃这个
+    x.fillStyle = INK; x.font = FT(800, 28); x.fillText("为什么点吃这个 🤔", W / 2, yNext); yNext += 48;
+    for (const rsn of (s.reasons ?? []).slice(0, 3)) {
+      x.fillStyle = RED; x.font = FT(800, 24); x.fillText("✓", 106, yNext);
+      x.fillStyle = BODY; x.font = FT(400, 24);
+      yNext += wrapText(x, rsn, W / 2 + 14, yNext, W - 250, 36, 14) * 36 + 12;
+    }
+    // 运势加成：浅黄圆角块（先量高铺底，再写字）
+    yNext += 12;
+    const boxTop = yNext;
+    x.font = FT(400, 23);
+    let pre = 78;
+    for (const b of boosts) pre += countLines(x, "· " + b, W - 180) * 34 + 6;
+    x.fillStyle = TINT; round(56, boxTop - 8, W - 112, pre + 22, 26); x.fill();
+    x.fillStyle = RED; x.font = FT(800, 25); x.fillText("⚡ 运势加成玩法", W / 2, boxTop + 40);
+    let by = boxTop + 78;
+    x.font = FT(400, 23); x.fillStyle = BODY;
+    for (const b of boosts) { by += wrapText(x, "· " + b, W / 2, by, W - 180, 34, 12) * 34 + 6; }
+    // footer（动态位置）+ 高度裁切
+    const footY = by + 54;
+    x.fillStyle = INK; x.font = FT(700, 26); x.fillText("明天，签就换了。今天全国都吃这个。", W / 2, footY);
+    x.fillStyle = SUB; x.font = FT(400, 21); x.fillText("github.com/unknownparticles/mcd", W / 2, footY + 44);
+    const finalH = footY + 198;
+    const out = document.createElement("canvas");
+    out.width = W; out.height = finalH;
+    const ox = out.getContext("2d");
+    if (bgImg) ox.drawImage(bgImg, 0, 0, W, finalH);
+    else { ox.fillStyle = "#FFFFFF"; ox.fillRect(0, 0, W, finalH); }
+    ox.drawImage(cv, 0, 0);
+    // 前景：底部薯条插画（红盒金薯）
+    if (fryImg) ox.drawImage(fryImg, W / 2 - 63, footY + 94);
   $("shareImg").src = out.toDataURL("image/png");
   $("shareOv").classList.add("on");
   } catch (e) {
@@ -997,10 +1004,6 @@ $("shareBtn").onclick = async () => {
     btn.disabled = false; btn.style.opacity = ""; btn.innerHTML = oldHtml;
   }
 };
-function dashedLine(x, x1, y, x2) {
-  x.strokeStyle = "#E8C88A"; x.setLineDash([6, 6]); x.lineWidth = 1;
-  x.beginPath(); x.moveTo(x1, y); x.lineTo(x2, y); x.stroke(); x.setLineDash([]);
-}
 function wrapText(x, text, cx, y, maxW, lh, leftInset = 0) {
   let line = "", lines = [];
   for (const ch of text) {
@@ -1010,6 +1013,11 @@ function wrapText(x, text, cx, y, maxW, lh, leftInset = 0) {
   lines.push(line);
   lines.forEach((l, i) => x.fillText(l, cx, y + i * lh));
   return lines.length;
+}
+function countLines(x, text, maxW) {
+  let line = "", n = 1;
+  for (const ch of text) { if (x.measureText(line + ch).width > maxW) { n++; line = ch; } else line += ch; }
+  return n;
 }
 $("shareClose").onclick = () => $("shareOv").classList.remove("on");
 $("shareOv").onclick = e => { if (e.target === $("shareOv")) $("shareOv").classList.remove("on"); };
