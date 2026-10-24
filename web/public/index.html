@@ -6,15 +6,15 @@
 <title>麦门今日签 · 每日全国同签</title>
 <style>
   :root {
-    --bg: #F7F4EE; --card: #FFFFFF; --paper: #FFF9EF;
-    --ink: #221A0E; --ink2: #7C7263; --ink3: #B3A993;
-    --sep: rgba(80,64,40,.14);
-    --accent: #B87A0A; --accent-soft: #FFF6E3;
-    --gold: #F5B31E; --gold-deep: #E08A00; --gold-lite: #FFD34D;
-    --red: #DA291C; --red-deep: #A31409; --green: #2E9E52;
+    --bg: #FFFFFF; --card: #FFFFFF; --paper: #FFFDF6;
+    --ink: #27251F; --ink2: #6E6A63; --ink3: #A6A198;
+    --sep: rgba(39,37,31,.12);
+    --accent: #DA291C; --accent-soft: #FFF6D6;
+    --gold: #FFC72C; --gold-deep: #DA291C; --gold-lite: #FFD95E;
+    --red: #DA291C; --red-deep: #B91E13; --green: #1E9E50;
     --serif: "Songti SC", "STSongti-SC", "Noto Serif SC", "SimSun", Georgia, serif;
     --r: 20px;
-    --shadow: 0 2px 10px rgba(60,40,10,.07), 0 16px 40px rgba(60,40,10,.08);
+    --shadow: 0 2px 10px rgba(30,26,18,.06), 0 16px 40px rgba(30,26,18,.08);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: smooth; }
@@ -25,35 +25,35 @@
   }
   .wrap { max-width: 480px; margin: 0 auto; padding: 0 20px 80px; position: relative; z-index: 2; }
 
-  /* ============ 深红 Hero ============ */
+  /* ============ 金拱黄 Hero（品牌黄主导）============ */
   .hero {
     position: relative; overflow: hidden;
     background:
-      radial-gradient(120% 90% at 80% -10%, rgba(255,199,44,.16), transparent 55%),
-      linear-gradient(165deg, #B01C0F 0%, var(--red) 55%, #C21B0E 100%);
+      radial-gradient(120% 90% at 80% -10%, rgba(255,255,255,.55), transparent 55%),
+      linear-gradient(165deg, #FFD95E 0%, var(--gold) 55%, #FFB81C 100%);
     padding: 78px 20px 108px;
   }
-  .arches { position: absolute; right: -70px; top: -40px; opacity: .14; pointer-events: none; }
-  .arches-l { position: absolute; left: -90px; bottom: -120px; opacity: .1; pointer-events: none; }
+  .arches { position: absolute; right: -70px; top: -40px; opacity: .32; pointer-events: none; }
+  .arches-l { position: absolute; left: -90px; bottom: -120px; opacity: .22; pointer-events: none; }
   .hero-in { max-width: 480px; margin: 0 auto; position: relative; }
   .brand-row { display: flex; align-items: center; gap: 9px; margin-bottom: 26px; }
-  .brand-name { color: #FFF4D6; font-weight: 800; font-size: 15px; letter-spacing: .04em; }
-  .brand-en { color: rgba(255,244,214,.55); font-size: 10px; font-weight: 600; letter-spacing: .22em; margin-left: 2px; }
-  .live-row { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: #FFE9A8; background: rgba(255,255,255,.12); border: 1px solid rgba(255,225,140,.35); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; backdrop-filter: blur(4px); }
-  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #FFE9A8; animation: blink 1.6s infinite; }
+  .brand-name { color: var(--ink); font-weight: 800; font-size: 15px; letter-spacing: .04em; }
+  .brand-en { color: rgba(39,37,31,.5); font-size: 10px; font-weight: 600; letter-spacing: .22em; margin-left: 2px; }
+  .live-row { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.6); border: 1px solid rgba(39,37,31,.14); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; backdrop-filter: blur(4px); }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1.6s infinite; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-  h1 { font-family: var(--serif); font-weight: 900; font-size: 40px; line-height: 1.22; letter-spacing: .02em; color: #FFF9EC; text-shadow: 0 2px 18px rgba(0,0,0,.18); }
-  h1 em { font-style: normal; color: var(--gold-lite); position: relative; }
-  h1 em::after { content: ""; position: absolute; left: 2%; right: 2%; bottom: 2px; height: 7px; background: rgba(255,211,77,.35); border-radius: 4px; z-index: -1; }
-  .sub { margin-top: 14px; font-size: 14.5px; color: rgba(255,240,215,.78); line-height: 1.7; }
-  .sub b { color: #FFF; font-weight: 700; border-bottom: 1px solid rgba(255,211,77,.6); padding-bottom: 1px; }
+  h1 { font-family: var(--serif); font-weight: 900; font-size: 40px; line-height: 1.22; letter-spacing: .02em; color: var(--ink); text-shadow: 0 2px 18px rgba(0,0,0,.05); }
+  h1 em { font-style: normal; color: var(--red); position: relative; }
+  h1 em::after { content: ""; position: absolute; left: 2%; right: 2%; bottom: 2px; height: 7px; background: rgba(255,255,255,.75); border-radius: 4px; z-index: -1; }
+  .sub { margin-top: 14px; font-size: 14.5px; color: rgba(39,37,31,.72); line-height: 1.7; }
+  .sub b { color: var(--ink); font-weight: 700; border-bottom: 1px solid rgba(218,41,28,.55); padding-bottom: 1px; }
 
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 60; }
   .nav-in { max-width: 480px; margin: 0 auto; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
   .nav-logo { display: flex; align-items: center; gap: 8px; }
   .nav-right { display: flex; gap: 8px; align-items: center; }
-  .streak-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #5C3D00; background: linear-gradient(120deg, #FFE9B0, #FFD98E); padding: 6px 13px; border-radius: 999px; box-shadow: 0 2px 8px rgba(160,110,0,.25); }
-  .icon-btn { width: 36px; height: 36px; border: none; background: rgba(255,255,255,.16); backdrop-filter: blur(6px); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #FFF4D6; transition: transform .15s; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.75); padding: 6px 13px; border-radius: 999px; box-shadow: 0 2px 8px rgba(30,26,18,.12); }
+  .icon-btn { width: 36px; height: 36px; border: none; background: rgba(255,255,255,.55); backdrop-filter: blur(6px); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); transition: transform .15s; }
   .icon-btn:active { transform: scale(.88); }
 
   /* ============ 卡片（上浮叠压 hero）============ */
@@ -73,10 +73,10 @@
   .mbti-input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(245,179,30,.16); background: #fff; }
   .sug-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; min-height: 28px; justify-content: center; }
   .sug { padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid rgba(245,179,30,.35); letter-spacing: .08em; }
-  .persona-chip { display: none; margin-top: 12px; padding: 13px 15px; background: linear-gradient(120deg, #FFF6E3, #FFF1D6); border: 1px solid rgba(245,179,30,.3); border-radius: 14px; font-size: 13.5px; line-height: 1.65; color: #6E4B04; }
+  .persona-chip { display: none; margin-top: 12px; padding: 13px 15px; background: linear-gradient(120deg, #FFF6D6, #FFF1C2); border: 1px solid rgba(255,199,44,.45); border-radius: 14px; font-size: 13.5px; line-height: 1.65; color: var(--ink); }
   .persona-chip b { font-size: 14px; }
 
-  .loc-btn { width: 100%; padding: 15px; border-radius: 15px; border: 1.5px dashed rgba(184,122,10,.4); cursor: pointer; background: #FCFAF5; color: var(--accent); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s; font-family: inherit; }
+  .loc-btn { width: 100%; padding: 15px; border-radius: 15px; border: 1.5px dashed rgba(218,41,28,.4); cursor: pointer; background: #FCFBF8; color: var(--accent); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s; font-family: inherit; }
   .loc-btn:active { background: var(--accent-soft); }
   .loc-btn.busy { pointer-events: none; opacity: .6; }
   .loc-status { margin-top: 10px; font-size: 13px; color: var(--ink2); text-align: center; min-height: 18px; line-height: 1.5; }
@@ -89,13 +89,13 @@
 
   .go {
     width: 100%; margin-top: 18px; height: 60px; border: none; border-radius: 19px; cursor: pointer;
-    font-size: 18px; font-weight: 800; letter-spacing: .14em; color: #4A2E00; font-family: inherit;
-    background: linear-gradient(180deg, var(--gold-lite), var(--gold) 60%, #EFA908);
-    box-shadow: 0 4px 0 #C98A08, 0 14px 30px rgba(201,138,8,.4);
+    font-size: 18px; font-weight: 800; letter-spacing: .14em; color: var(--ink); font-family: inherit;
+    background: linear-gradient(180deg, var(--gold-lite), var(--gold) 60%, #F5AD00);
+    box-shadow: 0 4px 0 #D9A400, 0 14px 30px rgba(255,199,44,.45);
     display: flex; align-items: center; justify-content: center; gap: 10px;
     transition: transform .12s, box-shadow .12s;
   }
-  .go:active { transform: translateY(3px); box-shadow: 0 1px 0 #C98A08, 0 8px 20px rgba(201,138,8,.35); }
+  .go:active { transform: translateY(3px); box-shadow: 0 1px 0 #D9A400, 0 8px 20px rgba(255,199,44,.4); }
   .go:disabled { opacity: .55; }
   .go-hint { text-align: center; font-size: 12px; color: var(--ink3); margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 5px; }
   .go-hint svg { color: var(--ink3); }
@@ -112,11 +112,11 @@
   .sign.show { display: block; }
   .limited-chip { display: none; text-align: center; margin-bottom: 14px; }
   .limited-chip.show { display: block; animation: rise .5s cubic-bezier(.2,.8,.2,1); }
-  .limited-chip span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: #8A1F14; background: linear-gradient(120deg, #FFE3B8, #FFCF9E); padding: 7px 18px; border-radius: 999px; border: 1px solid rgba(184,122,10,.35); }
+  .limited-chip span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink); background: linear-gradient(120deg, #FFD95E, var(--gold)); padding: 7px 18px; border-radius: 999px; border: 1px solid rgba(218,41,28,.25); }
 
   .paper {
     position: relative; background: var(--paper); border-radius: 14px; overflow: hidden;
-    box-shadow: var(--shadow), inset 0 0 0 1px rgba(184,122,10,.35), inset 0 0 0 5px var(--paper), inset 0 0 0 6px rgba(184,122,10,.22);
+    box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,199,44,.9), inset 0 0 0 5px var(--paper), inset 0 0 0 6px rgba(255,199,44,.5);
     animation: rise .55s cubic-bezier(.2,.8,.2,1) backwards;
   }
   .paper-head {
@@ -124,7 +124,7 @@
     padding: 20px 16px 18px; position: relative;
   }
   .paper-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 12px; background: var(--paper); clip-path: polygon(0 100%, 5% 0, 10% 100%, 15% 0, 20% 100%, 25% 0, 30% 100%, 35% 0, 40% 100%, 45% 0, 50% 100%, 55% 0, 60% 100%, 65% 0, 70% 100%, 75% 0, 80% 100%, 85% 0, 90% 100%, 95% 0, 100% 100%); }
-  .ph-cn { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: .42em; text-indent: .42em; color: #FFF4D6; }
+  .ph-cn { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: .42em; text-indent: .42em; color: #FFFFFF; }
   .ph-en { font-size: 9px; font-weight: 700; letter-spacing: .4em; color: rgba(255,220,140,.7); margin-top: 5px; }
   .paper-body { padding: 26px 22px 8px; }
   .seal { position: absolute; right: 18px; top: 92px; transform: rotate(7deg); filter: drop-shadow(0 2px 4px rgba(163,20,9,.3)); }
@@ -139,9 +139,9 @@
   .price-row s { color: var(--ink3); font-size: 15px; }
   .save-chip { font-size: 12px; font-weight: 700; color: #1B7A3D; background: rgba(52,199,89,.13); border: 1px solid rgba(52,199,89,.3); padding: 3px 10px; border-radius: 999px; }
   .fortune {
-    margin-top: 18px; padding: 18px 18px 18px 22px; background: rgba(245,179,30,.09); border-radius: 4px 14px 14px 4px;
+    margin-top: 18px; padding: 18px 18px 18px 22px; background: rgba(255,199,44,.13); border-radius: 4px 14px 14px 4px;
     border-left: 3px solid var(--gold);
-    font-family: var(--serif); font-size: 16.5px; line-height: 2; color: #4A3A20; min-height: 84px;
+    font-family: var(--serif); font-size: 16.5px; line-height: 2; color: #3D3A33; min-height: 84px;
   }
   .cursor { display: inline-block; width: 2px; height: 1em; background: var(--gold-deep); vertical-align: -0.15em; animation: blink .8s infinite; }
   .reasons { margin-top: 18px; }
@@ -151,8 +151,8 @@
   .reason:last-child { border-bottom: none; }
   .reason .tick { color: var(--gold-deep); font-weight: 800; flex-shrink: 0; }
   .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; padding-bottom: 16px; }
-  .meta-pill { font-size: 12px; color: var(--ink2); background: rgba(245,179,30,.1); border: 1px solid rgba(184,122,10,.18); padding: 5px 11px; border-radius: 999px; }
-  .paper-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; border-top: 1px dashed rgba(184,122,10,.4); }
+  .meta-pill { font-size: 12px; color: var(--ink2); background: rgba(255,199,44,.12); border: 1px solid rgba(255,199,44,.5); padding: 5px 11px; border-radius: 999px; }
+  .paper-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; border-top: 1px dashed rgba(255,199,44,.75); }
   .paper-foot .pf-t { font-size: 11px; color: var(--ink3); letter-spacing: .22em; }
   .barcode { opacity: .55; }
 
@@ -193,7 +193,7 @@
   .pay-btn { display: flex; align-items: center; justify-content: center; gap: 8px; text-align: center; height: 50px; border-radius: 15px; background: #fff; border: 1.5px solid var(--sep); color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none; }
   .pay-btn svg { color: var(--green); }
   .order-meta { text-align: center; font-size: 12.5px; color: var(--ink2); margin-top: 12px; line-height: 1.7; }
-  .pickup { text-align: center; margin-top: 16px; padding: 18px; background: var(--paper); border: 1.5px dashed rgba(184,122,10,.4); border-radius: 16px; }
+  .pickup { text-align: center; margin-top: 16px; padding: 18px; background: var(--paper); border: 1.5px dashed rgba(255,199,44,.8); border-radius: 16px; }
   .pickup .code { font-family: var(--serif); font-size: 46px; font-weight: 900; letter-spacing: .22em; text-indent: .22em; color: var(--red-deep); font-variant-numeric: tabular-nums; }
   .pickup .lbl { font-size: 11px; color: var(--ink2); letter-spacing: .3em; text-indent: .3em; margin-bottom: 4px; }
   .row-btns { display: flex; gap: 10px; margin-top: 14px; }
@@ -202,7 +202,7 @@
   .err2 { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; }
 
   /* collection toast */
-  .toast { position: fixed; left: 50%; bottom: 40px; transform: translate(-50%, 80px); z-index: 120; background: #221A0E; color: #FFF4D6; font-size: 13.5px; font-weight: 600; padding: 13px 22px; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.25); transition: transform .4s cubic-bezier(.2,.8,.2,1); max-width: 86%; text-align: center; }
+  .toast { position: fixed; left: 50%; bottom: 40px; transform: translate(-50%, 80px); z-index: 120; background: var(--ink); color: #FFFFFF; font-size: 13.5px; font-weight: 600; padding: 13px 22px; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.25); transition: transform .4s cubic-bezier(.2,.8,.2,1); max-width: 86%; text-align: center; }
   .toast.on { transform: translate(-50%, 0); }
 
   /* share overlay */
@@ -252,7 +252,7 @@
   .sheet-done { width: 100%; height: 52px; margin-top: 18px; border: none; border-radius: 16px; background: linear-gradient(165deg, #C21B0E, var(--red)); color: #FFF4D6; font-size: 16px; font-weight: 800; letter-spacing: .1em; cursor: pointer; font-family: inherit; box-shadow: 0 8px 20px rgba(218,41,28,.3); }
   .coll-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; padding: 14px 16px; }
   .coll-cell { aspect-ratio: 1; border-radius: 10px; background: #FCFAF5; border: 1px dashed var(--sep); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; color: var(--ink3); }
-  .coll-cell.got { background: linear-gradient(140deg, #FFE9B8, #FFD591); border: none; color: #8A5A00; font-weight: 700; }
+  .coll-cell.got { background: linear-gradient(140deg, #FFD95E, var(--gold)); border: none; color: var(--ink); font-weight: 700; }
   .coll-cell b { font-size: 13px; }
 
   /* quiz */
@@ -326,11 +326,11 @@
     </symbol>
     <symbol id="i-cup" viewBox="0 0 60 70">
       <g>
-        <rect x="20" y="4" width="3.4" height="26" rx="1.7" fill="#E8A11B" transform="rotate(-9 21 17)"/>
-        <rect x="27" y="0" width="3.4" height="30" rx="1.7" fill="#C77F0A"/>
-        <rect x="34" y="3" width="3.4" height="27" rx="1.7" fill="#E8A11B" transform="rotate(8 36 16)"/>
-        <rect x="40" y="8" width="3.4" height="23" rx="1.7" fill="#B36A08" transform="rotate(15 42 19)"/>
-        <ellipse cx="30" cy="33" rx="19" ry="5" fill="#5C3D00"/>
+        <rect x="20" y="4" width="3.4" height="26" rx="1.7" fill="#FFD95E" transform="rotate(-9 21 17)"/>
+        <rect x="27" y="0" width="3.4" height="30" rx="1.7" fill="#FFC72C"/>
+        <rect x="34" y="3" width="3.4" height="27" rx="1.7" fill="#FFD95E" transform="rotate(8 36 16)"/>
+        <rect x="40" y="8" width="3.4" height="23" rx="1.7" fill="#F5A800" transform="rotate(15 42 19)"/>
+        <ellipse cx="30" cy="33" rx="19" ry="5" fill="#27251F"/>
         <path d="M12.5,33 C12.5,30.5 15,29 18,29 L42,29 C45,29 47.5,30.5 47.5,33 L43.5,62 C43,66 40,68.5 36,68.5 L24,68.5 C20,68.5 17,66 16.5,62 Z" fill="#DA291C"/>
         <path d="M12.5,33 C12.5,30.5 15,29 18,29 L42,29 C45,29 47.5,30.5 47.5,33 L47.2,36.5 C46.5,34.8 44.5,34 42,34 L18,34 C15.5,34 13.5,34.8 12.8,36.5 Z" fill="#B71C13" opacity=".6"/>
         <path d="M14.6,45 L45.4,45 M15.6,53 L44.4,53" stroke="#FFC72C" stroke-width="3.4" stroke-linecap="round"/>
@@ -366,14 +366,14 @@
     <span class="nav-title" style="display:none"></span>
   </div>
   <div class="nav-right">
-    <span class="streak-badge" id="streakBadge" style="display:none"><svg width="12" height="13" viewBox="0 0 15 16" style="color:#C77F0A"><use href="#i-flame"/></svg><span id="streakText"></span></span>
+    <span class="streak-badge" id="streakBadge" style="display:none"><svg width="12" height="13" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-flame"/></svg><span id="streakText"></span></span>
     <button class="icon-btn" id="settingsBtn" title="设置与签册"><svg width="17" height="18"><use href="#i-gear"/></svg></button>
   </div>
 </div></nav>
 
 <div class="hero">
-  <svg class="arches" width="330" height="264" viewBox="0 0 100 80" style="color:#FFC72C"><use href="#i-arches"/></svg>
-  <svg class="arches-l" width="420" height="336" viewBox="0 0 100 80" style="color:#FFC72C"><use href="#i-arches"/></svg>
+  <svg class="arches" width="330" height="264" viewBox="0 0 100 80" style="color:#FFFFFF"><use href="#i-arches"/></svg>
+  <svg class="arches-l" width="420" height="336" viewBox="0 0 100 80" style="color:#FFFFFF"><use href="#i-arches"/></svg>
   <div class="hero-in">
     <div class="brand-row">
       <span class="brand-name">麦门今日签</span>
@@ -387,7 +387,7 @@
 
 <div class="wrap">
   <div class="card lift">
-    <div class="sec"><span class="sec-t"><svg width="14" height="15" viewBox="0 0 15 16" style="color:#C77F0A"><use href="#i-flame"/></svg>你的 MBTI 命格</span><button id="quizBtn">不知道？20 秒快测 →</button></div>
+    <div class="sec"><span class="sec-t"><svg width="14" height="15" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-flame"/></svg>你的 MBTI 命格</span><button id="quizBtn">不知道？20 秒快测 →</button></div>
     <input class="mbti-input" id="mbtiInput" placeholder="如 INTJ" maxlength="4" autocomplete="off" spellcheck="false">
     <div class="sug-row" id="sugRow"></div>
     <div class="persona-chip" id="personaChip"></div>
@@ -412,7 +412,7 @@
   <div class="err" id="err1"></div>
 
   <div class="sign" id="signCard">
-    <div class="limited-chip" id="limitedChip"><span><svg width="13" height="14" viewBox="0 0 15 16" style="color:#B36A08"><use href="#i-lantern"/></svg><span id="limitedText"></span></span></div>
+    <div class="limited-chip" id="limitedChip"><span><svg width="13" height="14" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-lantern"/></svg><span id="limitedText"></span></span></div>
     <div class="paper">
       <div class="paper-head">
         <div class="ph-cn">麥門今日籤</div>
@@ -425,7 +425,7 @@
         <div class="price-row"><b id="price"></b><s id="orig"></s><span class="save-chip" id="save" style="display:none"></span></div>
         <div class="fortune" id="fortune"></div>
         <div class="reasons">
-          <div class="reasons-t"><svg width="13" height="13" viewBox="0 0 15 15" style="color:#C77F0A"><use href="#i-star"/></svg>为什么是它</div>
+          <div class="reasons-t"><svg width="13" height="13" viewBox="0 0 15 15" style="color:#DA291C"><use href="#i-star"/></svg>为什么是它</div>
           <div id="reasons"></div>
         </div>
         <div class="meta-row" id="pills"></div>
