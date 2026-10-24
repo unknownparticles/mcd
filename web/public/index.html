@@ -296,6 +296,19 @@
   .pool-cell { aspect-ratio: 3/4.2; border-radius: 8px; background: #FCFAF5; border: 1px dashed var(--sep); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: 8.5px; color: var(--ink3); text-align: center; padding: 2px; overflow: hidden; }
   .pool-cell .rb { font-weight: 900; font-size: 10.5px; }
   .pool-cell.got { border: none; font-weight: 700; }
+  /* 卡牌唯一编号 + 收藏 + 交换 */
+  .my-coll { display: flex; gap: 9px; overflow-x: auto; padding: 12px 14px; scrollbar-width: none; min-height: 96px; align-items: center; }
+  .my-coll::-webkit-scrollbar { display: none; }
+  .my-card-chip { flex-shrink: 0; width: 70px; border-radius: 10px; overflow: hidden; border: 1px solid var(--sep); background: #fff; cursor: pointer; transition: transform .15s; position: relative; }
+  .my-card-chip:active { transform: scale(.94); }
+  .my-card-chip svg { display: block; width: 100%; height: auto; }
+  .my-card-chip .sw { position: absolute; right: 3px; bottom: 3px; font-size: 7.5px; font-weight: 800; background: rgba(218,41,28,.9); color: #fff; border-radius: 5px; padding: 1.5px 4px; letter-spacing: .05em; }
+  .trade-row { display: flex; gap: 8px; margin-top: 12px; }
+  .trade-btn { flex: 1; height: 46px; border-radius: 13px; border: 1.5px solid var(--sep); background: #fff; color: var(--ink); font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .trade-btn.gold { background: linear-gradient(180deg, var(--gold-lite), var(--gold)); border: none; box-shadow: 0 3px 0 #D9A400; }
+  .qr-box { width: 180px; height: 180px; margin: 14px auto 2px; border-radius: 14px; background: #fff; border: 1px solid var(--sep); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .qr-box img { width: 100%; height: 100%; display: block; }
+  .uid-chip { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; letter-spacing: .05em; color: var(--ink2); background: rgba(39,37,31,.06); border-radius: 6px; padding: 3px 9px; margin-top: 8px; }
 
   /* quiz */
   .q-progress { display: flex; gap: 6px; justify-content: center; margin: 6px 0 22px; }
@@ -582,17 +595,50 @@
 <div class="sheet" id="cardSheet">
   <div class="grabber"></div>
   <h2>麦门卡牌 · 每日一抽</h2>
-  <div class="hint" id="cardHint">每个号每天限抽 1 张 · 卡池每月更换 · 节日/节气出限定卡</div>
+  <div class="hint" id="cardHint">每个号每天限抽 1 张 · 每张卡都有全球唯一编号 · 卡池每月更换 · 节日/节气出限定卡</div>
   <div class="draw-stage">
     <div class="mcard-wrap" id="cardWrap"><div class="mcard" id="cardBox"></div></div>
     <button class="draw-btn" id="drawBtn">抽 今 日 卡</button>
     <div class="draw-meta" id="drawMeta"></div>
     <div class="rates" id="rates"></div>
   </div>
+  <h2 style="margin-top:18px">我的收藏 · 点卡交换</h2>
+  <div class="hint">每张卡由「设备码+IP+时间戳」生成唯一编号，卡面细节随编号变化 · 点一张卡生成交换二维码 / NFC / 链接</div>
+  <div class="set-card" style="padding:0"><div class="my-coll" id="myColl"></div></div>
   <h2 style="margin-top:18px" id="poolTitle">本月卡池</h2>
   <div class="hint" id="poolHint"></div>
   <div class="set-card"><div class="pool-grid" id="poolGrid"></div></div>
   <button class="sheet-done" id="cardDone">收 起</button>
+</div>
+
+<!-- 交换卡片 -->
+<div class="sheet" id="tradeSheet">
+  <div class="grabber"></div>
+  <h2>交换这张卡</h2>
+  <div class="draw-stage" style="padding-top:0">
+    <div class="mcard" id="tradeCard" style="width:120px"></div>
+    <div class="uid-chip" id="tradeUid"></div>
+  </div>
+  <div class="qr-box"><img id="tradeQr" alt="交换二维码"></div>
+  <div class="hint" style="text-align:center" id="tradeHint">对方扫码（或碰一碰 NFC 标签）打开链接，即可收下这张卡</div>
+  <div class="trade-row">
+    <button class="trade-btn" id="tradeCopy">🔗 复制链接</button>
+    <button class="trade-btn" id="tradeShare" style="display:none">📤 分享</button>
+    <button class="trade-btn gold" id="tradeNfc">📶 NFC 写入</button>
+  </div>
+  <button class="sheet-done" id="tradeDone">完 成</button>
+</div>
+
+<!-- 接收卡片 -->
+<div class="sheet" id="recvSheet">
+  <div class="grabber"></div>
+  <h2>📮 麦友送来一张卡</h2>
+  <div class="draw-stage" style="padding-top:0">
+    <div class="mcard" id="recvCard" style="width:130px"></div>
+    <div class="uid-chip" id="recvUid"></div>
+  </div>
+  <button class="draw-btn" id="recvBtn" style="background:linear-gradient(165deg,#E5301F,var(--red) 55%,#C21B0E);color:#fff;box-shadow:0 4px 0 #A31409">收 下 这 张 卡</button>
+  <button class="sheet-done" id="recvDone">不 要</button>
 </div>
 
 <script>
@@ -915,19 +961,70 @@ function todayPool() {
   const fest = dateInfoCache && dateInfoCache.date === t ? (dateInfoCache.festival || dateInfoCache.term || "") : "";
   return { fest, pool: [...(fest ? festivalPool(fest, ym) : []), ...monthPool(ym)] };
 }
+/* —— 唯一码：设备码 + 出口 IP + 时间戳 —— */
+async function makeCardUid() {
+  let ip = "";
+  try { ip = ((await (await fetch("/api/myip")).json()).ip) || ""; } catch { /* 离线时用设备盐+时间戳 */ }
+  const salt = localStorage.getItem("mcd-sign-salt") || "";
+  const raw = `${salt}|${ip}|${Date.now()}|${Math.random()}`;
+  const seg = s => hashStr(raw + s).toString(36).toUpperCase().padStart(7, "0").slice(-6);
+  const a = seg("a"), b = seg("b");
+  return `MB-${a.slice(0, 3)}${b.slice(0, 3)}-${a.slice(3)}${b.slice(3)}`;
+}
+/* —— 卡面差异化：同稀有度下，每张卡的装饰元素位置/样式由唯一码决定 —— */
 function cardSVG(card) {
-  const R = RAR[card.rarity], gid = "cg" + (hashStr(card.id) % 99999);
-  const isTop = card.rarity === "SSSR";
+  const R = RAR[card.rarity], isTop = card.rarity === "SSSR";
+  const gid = "cg" + (hashStr(card.uid || card.id) % 99999);
+  const r = rng(hashStr((card.uid || card.id) + "|art"));
+  let bg0 = R.bg[0], bg1 = R.bg[1], frame = R.frame, deco = "";
+  if (card.rarity === "N") {
+    // N：卡面颜色由唯一码决定（低饱和粉彩系）
+    const hue = Math.floor(r() * 360);
+    bg0 = `hsl(${hue},32%,93%)`; bg1 = `hsl(${hue},24%,79%)`; frame = `hsl(${hue},20%,64%)`;
+  } else if (card.rarity === "R") {
+    // R：地面线条（位置/疏密/相位随唯一码变化）
+    const gy = 164 + r() * 12, d1 = 3 + r() * 5, g1 = 2.5 + r() * 4, off = r() * 24;
+    deco = `<g stroke="${R.ink}" stroke-linecap="round" fill="none">
+      <line x1="14" y1="${gy.toFixed(1)}" x2="136" y2="${gy.toFixed(1)}" stroke-width="1.4" opacity=".38" stroke-dasharray="${d1.toFixed(1)} ${g1.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/>
+      <line x1="24" y1="${(gy + 6).toFixed(1)}" x2="126" y2="${(gy + 6).toFixed(1)}" stroke-width="1.2" opacity=".22" stroke-dasharray="${(d1 * 1.7).toFixed(1)} ${(g1 * 1.4).toFixed(1)}" stroke-dashoffset="${(off * 1.6).toFixed(1)}"/>
+      <line x1="34" y1="${(gy + 11.5).toFixed(1)}" x2="116" y2="${(gy + 11.5).toFixed(1)}" stroke-width="1" opacity=".12" stroke-dasharray="${(d1 * .7).toFixed(1)} ${(g1 * 1.9).toFixed(1)}" stroke-dashoffset="${(off * .5).toFixed(1)}"/>
+    </g>`;
+  } else if (card.rarity === "SR") {
+    // SR：波纹（中心点随唯一码移动）
+    const cx = 36 + r() * 78, cy = 58 + r() * 66;
+    deco = `<g fill="none" stroke="${R.ink}">
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="7" stroke-width="1.4" opacity=".32"/>
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="13" stroke-width="1.1" opacity=".2"/>
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="19" stroke-width=".9" opacity=".12"/>
+      <circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="25" stroke-width=".7" opacity=".07"/>
+    </g>`;
+  } else if (card.rarity === "SSR") {
+    // SSR：闪光粒子（6 颗四角星，位置/大小/亮度随唯一码变化）
+    for (let i = 0; i < 6; i++) {
+      const px = 14 + r() * 122, py = 34 + r() * 116, s = 2.2 + r() * 3.2, o = .35 + r() * .5;
+      deco += `<path d="M${px.toFixed(1)} ${(py - s).toFixed(1)} L${(px + s * .3).toFixed(1)} ${(py - s * .3).toFixed(1)} L${(px + s).toFixed(1)} ${py.toFixed(1)} L${(px + s * .3).toFixed(1)} ${(py + s * .3).toFixed(1)} L${px.toFixed(1)} ${(py + s).toFixed(1)} L${(px - s * .3).toFixed(1)} ${(py + s * .3).toFixed(1)} L${(px - s).toFixed(1)} ${py.toFixed(1)} L${(px - s * .3).toFixed(1)} ${(py - s * .3).toFixed(1)} Z" fill="#FFF" opacity="${o.toFixed(2)}"/>`;
+    }
+  } else {
+    // SSSR：彩带（位置/角度/颜色随唯一码变化）
+    const ang = (-40 + r() * 80).toFixed(1), tx = 8 + r() * 52, ty = 6 + r() * 42, len = 58 + r() * 52;
+    const c1 = r() > .5 ? "#FFC72C" : "#FF7A5C", dy = (r() * 26 - 13).toFixed(1);
+    deco = `<g transform="rotate(${ang} 75 100)" opacity=".85" fill="none" stroke-linecap="round">
+      <path d="M${tx.toFixed(1)} ${ty.toFixed(1)} q ${(len * .3).toFixed(1)} ${(8 + r() * 14).toFixed(1)} ${len.toFixed(1)} ${dy}" stroke="${c1}" stroke-width="${(3 + r() * 3).toFixed(1)}"/>
+      <path d="M${(tx + 5).toFixed(1)} ${(ty + 11 + r() * 12).toFixed(1)} q ${(len * .25).toFixed(1)} ${(10 + r() * 10).toFixed(1)} ${(len * .8).toFixed(1)} ${(r() * 20 - 10).toFixed(1)}" stroke="#FFC72C" stroke-width="${(2 + r() * 2).toFixed(1)}" opacity=".75"/>
+    </g>`;
+  }
   return `<svg viewBox="0 0 150 200" xmlns="http://www.w3.org/2000/svg">
-  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${R.bg[0]}"/><stop offset="1" stop-color="${R.bg[1]}"/></linearGradient></defs>
+  <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${bg0}"/><stop offset="1" stop-color="${bg1}"/></linearGradient></defs>
   <rect width="150" height="200" rx="14" fill="url(#${gid})"/>
-  <rect x="5" y="5" width="140" height="190" rx="10" fill="none" stroke="${R.frame}" stroke-width="${isTop ? 3 : 1.5}" opacity=".85"/>
-  <rect x="0" y="0" width="150" height="30" rx="14" fill="${R.ink}" opacity=".1"/>
-  <text x="75" y="21" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="900" font-size="13" fill="${R.ink}">${card.rarity}${"★".repeat(R.stars)}</text>
-  <use href="#${card.icon}" x="47" y="46" width="56" height="56" style="color:${R.ink}"/>
-  <text x="75" y="138" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="800" font-size="${card.name.length > 8 ? 11 : 13}" fill="#27251F">${card.name}</text>
-  <text x="75" y="160" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="600" font-size="8.5" fill="${R.ink}" opacity=".75">${card.special ? card.special + " · 限定" : card.ym + " 常驻"}</text>
-  <text x="75" y="186" text-anchor="middle" font-family="Songti SC,serif" font-weight="900" font-size="9" fill="${R.ink}" opacity=".6">麥 門 卡 牌</text>
+  ${deco}
+  <rect x="5" y="5" width="140" height="190" rx="10" fill="none" stroke="${frame}" stroke-width="${isTop ? 3 : 1.5}" opacity=".85"/>
+  <rect x="0" y="0" width="150" height="30" rx="14" fill="${card.rarity === "N" ? frame : R.ink}" opacity=".1"/>
+  <text x="75" y="21" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="900" font-size="13" fill="${card.rarity === "N" ? "#4A463F" : R.ink}">${card.rarity}${"★".repeat(R.stars)}</text>
+  <use href="#${card.icon}" x="47" y="46" width="56" height="56" style="color:${card.rarity === "N" ? "#4A463F" : R.ink}"/>
+  <text x="75" y="136" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="800" font-size="${card.name.length > 8 ? 11 : 13}" fill="#27251F">${card.name}</text>
+  <text x="75" y="156" text-anchor="middle" font-family="-apple-system,PingFang SC,sans-serif" font-weight="600" font-size="8.5" fill="${card.rarity === "N" ? "#4A463F" : R.ink}" opacity=".75">${card.special ? card.special + " · 限定" : card.ym + " 常驻"}</text>
+  <text x="75" y="172" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="600" font-size="6.8" fill="#27251F" opacity=".42">${card.uid || ""}</text>
+  <text x="75" y="188" text-anchor="middle" font-family="Songti SC,serif" font-weight="900" font-size="9" fill="${card.rarity === "N" ? "#4A463F" : R.ink}" opacity=".55">麥 門 卡 牌</text>
 </svg>`;
 }
 function cardBackSVG() {
@@ -950,14 +1047,23 @@ function renderCardView() {
   $("drawBtn").disabled = !!drawn;
   $("drawBtn").textContent = drawn ? "今 日 已 抽" : "抽 今 日 卡";
   $("drawMeta").textContent = drawn
-    ? `${drawn.rarity} ·「${drawn.name}」已收下${myCards.some(c => c.name === drawn.name) ? "" : " · 新收录！"} · 明天 0 点再来`
-    : "今天还没抽 · 每个号每天限 1 张，明天 0 点刷新";
+    ? `${drawn.rarity} ·「${drawn.name}」 · 编号 ${drawn.uid || "—"} · 明天 0 点再来`
+    : "今天还没抽 · 每个号每天限 1 张，抽到的卡全球唯一";
   $("rates").innerHTML = RAR_ORDER.slice().reverse().map(k => `<span class="rate-chip">${k} ${RAR[k].w}%</span>`).join("");
+  // 我的收藏（按唯一码去重；点卡交换）
+  const seen = new Set(), owned = [];
+  for (const c of myCards.sort((a, b) => RAR_ORDER.indexOf(a.rarity) - RAR_ORDER.indexOf(b.rarity))) {
+    if (seen.has(c.uid || c.id + c.ts)) continue; seen.add(c.uid || c.id + c.ts); owned.push(c);
+  }
+  $("myColl").innerHTML = owned.length
+    ? owned.map((c, i) => `<div class="my-card-chip" data-i="${i}" title="点此交换">${cardSVG(c)}<span class="sw">换</span></div>`).join("")
+    : `<div style="padding:16px;font-size:12.5px;color:var(--ink3);width:100%;text-align:center">还没有卡牌 · 先抽今日卡</div>`;
+  $("myColl").querySelectorAll(".my-card-chip").forEach(el => el.onclick = () => openTrade(owned[+el.dataset.i]));
+  const gotNames = new Set(myCards.map(c => c.name));
   const { fest, pool } = todayPool();
-  const got = new Set(myCards.map(c => c.name));
-  $("poolHint").textContent = `${t.slice(0, 7)} 卡池 · 共 ${pool.length} 张${fest ? ` · 本期含限定「${fest}」` : ""} · 已集 ${got.size} 张`;
+  $("poolHint").textContent = `${t.slice(0, 7)} 卡池 · 共 ${pool.length} 张${fest ? ` · 本期含限定「${fest}」` : ""} · 图鉴 ${gotNames.size}/${pool.length} · 藏卡 ${myCards.length}`;
   $("poolGrid").innerHTML = pool.map(c => {
-    const R = RAR[c.rarity], has = got.has(c.name);
+    const R = RAR[c.rarity], has = gotNames.has(c.name);
     return `<div class="pool-cell${has ? " got" : ""}"${has ? ` style="background:linear-gradient(140deg,${R.bg[0]},${R.bg[1]});color:${R.ink}"` : ""}><span class="rb"${has ? ` style="color:${R.ink}"` : ""}>${c.rarity}</span><span>${has ? c.name : "？"}</span></div>`;
   }).join("");
 }
@@ -972,23 +1078,102 @@ async function loadDateInfo() {
 }
 $("cardsBtn").onclick = async () => { await loadDateInfo(); renderCardView(); openSheet($("cardSheet")); };
 $("cardDone").onclick = closeSheets;
-$("drawBtn").onclick = () => {
+$("drawBtn").onclick = async () => {
   const t = beijingDate();
   if (drawRec && drawRec.date === t) return;
-  const { fest, pool } = todayPool();
-  const rar = rollRarity();
-  const tier = pool.filter(c => c.rarity === rar);
-  const card = tier[Math.floor(Math.random() * tier.length)];
-  drawRec = { date: t, ...card };
-  localStorage.setItem("mcd-draw", JSON.stringify(drawRec));
-  const isNew = !myCards.some(c => c.name === card.name);
-  if (isNew) { myCards.push({ name: card.name, rarity: card.rarity, special: card.special, ym: card.ym, ts: Date.now() }); localStorage.setItem("mcd-cards", JSON.stringify(myCards)); }
-  buzz(card.rarity === "SSSR" ? [60, 60, 60, 60, 120] : [30, 50, 30]);
-  toast(isNew
-    ? (card.rarity === "SSSR" ? "🎉 SSSR！！「" + card.name + "」传说收录！" : `新收录：${card.rarity} ·「${card.name}」`)
-    : `抽到 ${card.rarity} ·「${card.name}」（已收录过）`);
-  renderCardView();
+  const btn = $("drawBtn");
+  btn.disabled = true; btn.textContent = "抽 卡 中 …";
+  try {
+    const uid = await makeCardUid();                       // 设备码+IP+时间戳 → 全球唯一编号
+    const { fest, pool } = todayPool();
+    const rar = rollRarity();
+    const tier = pool.filter(c => c.rarity === rar);
+    const card = { ...tier[Math.floor(Math.random() * tier.length)], uid, ts: Date.now() };
+    drawRec = { date: t, ...card };
+    localStorage.setItem("mcd-draw", JSON.stringify(drawRec));
+    const isNew = !myCards.some(c => c.name === card.name);
+    myCards.push(card);
+    localStorage.setItem("mcd-cards", JSON.stringify(myCards));
+    buzz(card.rarity === "SSSR" ? [60, 60, 60, 60, 120] : [30, 50, 30]);
+    toast(isNew
+      ? (card.rarity === "SSSR" ? "🎉 SSSR！！「" + card.name + "」传说收录！" : `新收录：${card.rarity} ·「${card.name}」`)
+      : `抽到 ${card.rarity} ·「${card.name}」（图鉴已收录，此张编号唯一）`);
+  } catch (e) {
+    toast("抽卡失败：" + (e.message || e));
+  } finally {
+    renderCardView();
+  }
 };
+
+/* ================= 卡牌交换（二维码 / NFC / 链接） ================= */
+function cardPayload(c) { return { n: c.name, r: c.rarity, s: c.special || "", y: c.ym || "", u: c.uid, i: c.icon }; }
+function cardLink(c) {
+  const b = btoa(unescape(encodeURIComponent(JSON.stringify(cardPayload(c))))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return `${location.origin}${location.pathname}#card=${b}`;
+}
+function parseCardLink(hash) {
+  try {
+    const m = (hash || "").match(/#card=([A-Za-z0-9\-_]+)/); if (!m) return null;
+    const o = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/")))));
+    if (!o.n || !RAR[o.r] || !o.u) return null;
+    return { name: String(o.n).slice(0, 24), rarity: o.r, special: String(o.s || "").slice(0, 12), ym: String(o.y || "").slice(0, 7), uid: String(o.u).slice(0, 24), icon: o.i || "t-fries", from: "交换" };
+  } catch { return null; }
+}
+let tradeCard = null;
+function openTrade(c) {
+  if (!c.uid) return toast("这张是早期卡，没有唯一编号，不能交换");
+  tradeCard = c;
+  $("tradeCard").innerHTML = cardSVG(c);
+  $("tradeUid").textContent = c.uid;
+  $("tradeHint").textContent = "对方扫码（或碰一碰 NFC 标签）打开链接，即可收下这张卡";
+  const qr = $("tradeQr");
+  qr.style.display = ""; qr.onerror = () => { qr.style.display = "none"; $("tradeHint").textContent = "二维码生成失败（需联网），直接复制链接发给麦友也一样"; };
+  qr.src = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" + encodeURIComponent(cardLink(c));
+  if (navigator.share) { $("tradeShare").style.display = ""; $("tradeShare").onclick = () => navigator.share({ title: "麦门卡牌交换", text: `送你一张 ${c.rarity} ·「${c.name}」`, url: cardLink(c) }).catch(() => {}); }
+  else $("tradeShare").style.display = "none";
+  openSheet($("tradeSheet"));
+}
+$("tradeCopy").onclick = async () => {
+  if (!tradeCard) return;
+  try { await navigator.clipboard.writeText(cardLink(tradeCard)); toast("交换链接已复制，发给麦友吧 🔗"); }
+  catch {
+    const ta = document.createElement("textarea"); ta.value = cardLink(tradeCard); document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("交换链接已复制 🔗"); } catch { toast("复制失败，链接：" + cardLink(tradeCard)); }
+    ta.remove();
+  }
+};
+$("tradeNfc").onclick = async () => {
+  if (!tradeCard) return;
+  if (!("NDEFReader" in window)) return toast("此浏览器不支持 NFC（需 Android Chrome），用扫码/链接也一样");
+  try {
+    toast("请将手机贴近 NFC 标签…");
+    const ndef = new NDEFReader();
+    await ndef.write({ records: [{ recordType: "text", data: cardLink(tradeCard) }] });
+    toast("已写入 NFC 标签 ✅ 对方碰一碰即可收卡");
+  } catch (e) { toast("NFC 写入失败：" + (e.message || e)); }
+};
+$("tradeDone").onclick = closeSheets;
+/* 接收：链接 #card=… 或 NFC 标签打开 → 弹出收卡 */
+let recvCard = null;
+function tryImport() {
+  const c = parseCardLink(location.hash); if (!c) return;
+  history.replaceState(null, "", location.pathname);
+  recvCard = c;
+  $("recvCard").innerHTML = cardSVG(c);
+  $("recvUid").textContent = c.uid;
+  openSheet($("recvSheet"));
+}
+$("recvBtn").onclick = () => {
+  if (!recvCard) return;
+  if (myCards.some(x => x.uid === recvCard.uid)) { toast("这张卡已经在你的收藏里啦"); closeSheets(); return; }
+  myCards.push(recvCard);
+  localStorage.setItem("mcd-cards", JSON.stringify(myCards));
+  buzz([30, 50, 30]);
+  toast(`收下了 ${recvCard.rarity} ·「${recvCard.name}」🎉`);
+  recvCard = null; closeSheets(); renderCardView();
+};
+$("recvDone").onclick = () => { recvCard = null; closeSheets(); };
+tryImport(); // 页面带 #card= 链接打开（扫码/NFC/分享链接）→ 弹出收卡
 
 /* ================= 求签 ================= */
 function setStep(n) { [1,2,3].forEach(i => $("st"+i).className = "st" + (i === n ? " cur" : i < n ? " done" : "")); }

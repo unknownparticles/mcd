@@ -48,6 +48,7 @@ async function readBody(req) {
 
 // 网络定位兜底缓存（同 NAT 出口设备共用，10 分钟）
 let ipCache = null, ipCacheAt = 0;
+let myIpCache = null, myIpAt = 0;
 
 const handler = async (req, res) => {
   const json = (code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
@@ -57,6 +58,16 @@ const handler = async (req, res) => {
       const d = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);
       const di = resolveDate(d);
       return json(200, { date: d, term: di.term ?? null, festival: di.festival ?? null });
+    }
+    // 出口公网 IP（用于卡牌唯一码：设备码+IP+时间戳 保证每张卡全球唯一）
+    if (req.url === "/api/myip" && req.method === "GET") {
+      if (myIpCache && Date.now() - myIpAt < 60000) return json(200, { ip: myIpCache });
+      try {
+        const r = await fetch("http://ip-api.com/json/?fields=status,query");
+        const j = await r.json();
+        if (j.status === "success" && j.query) { myIpCache = String(j.query); myIpAt = Date.now(); return json(200, { ip: myIpCache }); }
+      } catch { /* fallthrough */ }
+      return json(200, { ip: (req.socket.remoteAddress || "").replace(/^::ffff:/, "") || "unknown" });
     }
     if (req.method === "GET") return serveStatic(req, res);
 
