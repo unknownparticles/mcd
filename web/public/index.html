@@ -25,35 +25,35 @@
   }
   .wrap { max-width: 480px; margin: 0 auto; padding: 0 20px 80px; position: relative; z-index: 2; }
 
-  /* ============ 金拱黄 Hero（品牌黄主导）============ */
+  /* ============ 品牌红 Hero（红黄白三主色）============ */
   .hero {
     position: relative; overflow: hidden;
     background:
-      radial-gradient(120% 90% at 80% -10%, rgba(255,255,255,.55), transparent 55%),
-      linear-gradient(165deg, #FFD95E 0%, var(--gold) 55%, #FFB81C 100%);
+      radial-gradient(120% 90% at 80% -10%, rgba(255,255,255,.14), transparent 55%),
+      linear-gradient(165deg, #E23A25 0%, var(--red) 55%, #C21B0E 100%);
     padding: 78px 20px 108px;
   }
-  .arches { position: absolute; right: -70px; top: -40px; opacity: .32; pointer-events: none; }
-  .arches-l { position: absolute; left: -90px; bottom: -120px; opacity: .22; pointer-events: none; }
+  .arches { position: absolute; right: -70px; top: -40px; opacity: .18; pointer-events: none; }
+  .arches-l { position: absolute; left: -90px; bottom: -120px; opacity: .12; pointer-events: none; }
   .hero-in { max-width: 480px; margin: 0 auto; position: relative; }
   .brand-row { display: flex; align-items: center; gap: 9px; margin-bottom: 26px; }
-  .brand-name { color: var(--ink); font-weight: 800; font-size: 15px; letter-spacing: .04em; }
-  .brand-en { color: rgba(39,37,31,.5); font-size: 10px; font-weight: 600; letter-spacing: .22em; margin-left: 2px; }
-  .live-row { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.6); border: 1px solid rgba(39,37,31,.14); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; backdrop-filter: blur(4px); }
-  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1.6s infinite; }
+  .brand-name { color: #FFFFFF; font-weight: 800; font-size: 15px; letter-spacing: .04em; }
+  .brand-en { color: rgba(255,255,255,.55); font-size: 10px; font-weight: 600; letter-spacing: .22em; margin-left: 2px; }
+  .live-row { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; color: #FFFFFF; background: rgba(255,255,255,.14); border: 1px solid rgba(255,199,44,.4); padding: 6px 14px; border-radius: 999px; margin-bottom: 16px; backdrop-filter: blur(4px); }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--gold); animation: blink 1.6s infinite; }
   @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-  h1 { font-family: var(--serif); font-weight: 900; font-size: 40px; line-height: 1.22; letter-spacing: .02em; color: var(--ink); text-shadow: 0 2px 18px rgba(0,0,0,.05); }
-  h1 em { font-style: normal; color: var(--red); position: relative; }
-  h1 em::after { content: ""; position: absolute; left: 2%; right: 2%; bottom: 2px; height: 7px; background: rgba(255,255,255,.75); border-radius: 4px; z-index: -1; }
-  .sub { margin-top: 14px; font-size: 14.5px; color: rgba(39,37,31,.72); line-height: 1.7; }
-  .sub b { color: var(--ink); font-weight: 700; border-bottom: 1px solid rgba(218,41,28,.55); padding-bottom: 1px; }
+  h1 { font-family: var(--serif); font-weight: 900; font-size: 40px; line-height: 1.22; letter-spacing: .02em; color: #FFFFFF; text-shadow: 0 2px 18px rgba(0,0,0,.12); }
+  h1 em { font-style: normal; color: var(--gold-lite); position: relative; }
+  h1 em::after { content: ""; position: absolute; left: 2%; right: 2%; bottom: 2px; height: 7px; background: rgba(255,255,255,.35); border-radius: 4px; z-index: -1; }
+  .sub { margin-top: 14px; font-size: 14.5px; color: rgba(255,255,255,.82); line-height: 1.7; }
+  .sub b { color: #FFFFFF; font-weight: 700; border-bottom: 1px solid rgba(255,199,44,.7); padding-bottom: 1px; }
 
   nav { position: fixed; top: 0; left: 0; right: 0; z-index: 60; }
   .nav-in { max-width: 480px; margin: 0 auto; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; }
   .nav-logo { display: flex; align-items: center; gap: 8px; }
   .nav-right { display: flex; gap: 8px; align-items: center; }
-  .streak-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--ink); background: rgba(255,255,255,.75); padding: 6px 13px; border-radius: 999px; box-shadow: 0 2px 8px rgba(30,26,18,.12); }
-  .icon-btn { width: 36px; height: 36px; border: none; background: rgba(255,255,255,.55); backdrop-filter: blur(6px); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink); transition: transform .15s; }
+  .streak-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: #FFFFFF; background: rgba(255,255,255,.16); padding: 6px 13px; border-radius: 999px; box-shadow: 0 2px 8px rgba(120,10,5,.2); }
+  .icon-btn { width: 36px; height: 36px; border: none; background: rgba(255,255,255,.18); backdrop-filter: blur(6px); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #FFFFFF; transition: transform .15s; }
   .icon-btn:active { transform: scale(.88); }
 
   /* ============ 卡片（上浮叠压 hero）============ */
@@ -366,14 +366,14 @@
     <span class="nav-title" style="display:none"></span>
   </div>
   <div class="nav-right">
-    <span class="streak-badge" id="streakBadge" style="display:none"><svg width="12" height="13" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-flame"/></svg><span id="streakText"></span></span>
+    <span class="streak-badge" id="streakBadge" style="display:none"><svg width="12" height="13" viewBox="0 0 15 16" style="color:#FFC72C"><use href="#i-flame"/></svg><span id="streakText"></span></span>
     <button class="icon-btn" id="settingsBtn" title="设置与签册"><svg width="17" height="18"><use href="#i-gear"/></svg></button>
   </div>
 </div></nav>
 
 <div class="hero">
-  <svg class="arches" width="330" height="264" viewBox="0 0 100 80" style="color:#FFFFFF"><use href="#i-arches"/></svg>
-  <svg class="arches-l" width="420" height="336" viewBox="0 0 100 80" style="color:#FFFFFF"><use href="#i-arches"/></svg>
+  <svg class="arches" width="330" height="264" viewBox="0 0 100 80" style="color:#FFC72C"><use href="#i-arches"/></svg>
+  <svg class="arches-l" width="420" height="336" viewBox="0 0 100 80" style="color:#FFC72C"><use href="#i-arches"/></svg>
   <div class="hero-in">
     <div class="brand-row">
       <span class="brand-name">麦门今日签</span>
