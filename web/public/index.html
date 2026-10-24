@@ -408,7 +408,7 @@ function renderQuiz() {
       <h2>MBTI 快测</h2><div class="hint">凭直觉选，没有对错</div>
       <div class="q-progress">${QUIZ.map((_, i) => `<div class="q-dot${i <= quizIdx ? " on" : ""}"></div>`).join("")}</div>
       <div class="q-text">${quizIdx + 1}. ${q.q}</div>
-      ${q.opts.map((o, i) => `<button class="q-opt" data-i="${i}">${o[0]}<small>${o[1].split(" · ")[1] ?? ""}</small></button>`).join("")}`;
+      ${q.opts.map((o, i) => `<button class="q-opt" data-i="${i}">${o[0]}</button>`).join("")}`;
     body.querySelectorAll(".q-opt").forEach(btn => btn.onclick = () => {
       quizAns.push({ dim: DIMS[quizIdx], side: q.opts[btn.dataset.i][1].split(" · ")[0], why: q.opts[btn.dataset.i][1] });
       quizIdx++; renderQuiz();
