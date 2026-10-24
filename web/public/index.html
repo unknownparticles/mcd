@@ -3,296 +3,551 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>麦门今日签 · MBTI × 天气 × 节气</title>
+<title>麦门今日签</title>
 <style>
   :root {
-    --red: #DA291C;
-    --red-dark: #B71C13;
-    --yellow: #FFC72C;
-    --yellow-soft: #FFE9B3;
-    --cream: #FFF8EC;
-    --ink: #2B2118;
-    --ink-soft: #7A6A55;
-    --green: #0F8A5F;
+    --bg: #F5F5F7;
     --card: #FFFFFF;
-    --radius: 20px;
+    --ink: #1D1D1F;
+    --ink2: #86868B;
+    --ink3: #AEAEB2;
+    --sep: rgba(60,60,67,.12);
+    --accent: #C77F0A;        /* 薯条金 */
+    --accent-soft: #FFF7E6;
+    --gold: #F5B31E;
+    --red: #DA291C;
+    --green: #34C759;
+    --r: 18px;
+    --shadow: 0 2px 12px rgba(0,0,0,.06), 0 10px 32px rgba(0,0,0,.04);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html { scroll-behavior: smooth; }
   body {
-    font-family: -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
-    background: linear-gradient(180deg, #DA291C 0%, #E04A22 240px, var(--cream) 240px);
-    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro SC", "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+    background: var(--bg); color: var(--ink);
+    -webkit-font-smoothing: antialiased; letter-spacing: -0.01em;
     min-height: 100vh;
   }
-  .wrap { max-width: 460px; margin: 0 auto; padding: 0 16px 80px; }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 0 20px 90px; }
 
-  /* ---------- header ---------- */
-  header { text-align: center; padding: 40px 0 92px; color: #fff; }
-  .arch { font-size: 44px; line-height: 1; filter: drop-shadow(0 4px 10px rgba(0,0,0,.18)); }
-  h1 { font-size: 30px; font-weight: 800; letter-spacing: 10px; margin: 10px 0 8px; text-shadow: 0 2px 8px rgba(0,0,0,.2); }
-  h1 span { color: var(--yellow); }
-  .tagline { font-size: 13px; opacity: .92; letter-spacing: 1px; }
-  .badges { display: flex; gap: 8px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
-  .badge { font-size: 11px; padding: 4px 12px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px; letter-spacing: 1px; }
-
-  /* ---------- panel overlapping header ---------- */
-  .panel { background: var(--card); border-radius: var(--radius); padding: 22px 20px; box-shadow: 0 12px 32px rgba(150, 60, 20, .16); margin-top: -64px; }
-  .step-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: var(--ink-soft); letter-spacing: 2px; margin-bottom: 12px; }
-  .step-label .num { width: 20px; height: 20px; border-radius: 50%; background: var(--yellow); color: var(--ink); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; }
-
-  /* ---------- MBTI grid ---------- */
-  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-  .mbti {
-    padding: 11px 0 8px; text-align: center; border-radius: 12px; cursor: pointer; user-select: none;
-    border: 1.5px solid #F1E3C8; background: #FFFBF2; transition: all .15s ease;
+  /* ---------- frosted nav ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(245,245,247,.72); border-bottom: .5px solid var(--sep);
   }
-  .mbti b { display: block; font-size: 14px; color: var(--ink); }
-  .mbti i { display: block; font-style: normal; font-size: 10px; color: var(--ink-soft); margin-top: 2px; }
-  .mbti:hover { border-color: var(--yellow); }
-  .mbti.on { background: var(--red); border-color: var(--red); box-shadow: 0 6px 14px rgba(218,41,28,.32); transform: translateY(-2px); }
-  .mbti.on b { color: #fff; } .mbti.on i { color: rgba(255,255,255,.85); }
+  .nav-in { max-width: 480px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .nav-title { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+  .nav-title span { color: var(--accent); }
+  .icon-btn { width: 32px; height: 32px; border: none; background: rgba(120,120,128,.12); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: transform .15s; }
+  .icon-btn:active { transform: scale(.9); }
 
-  /* ---------- inputs ---------- */
-  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
-  .fields input { grid-column: span 1; }
-  input {
-    width: 100%; padding: 12px 14px; border: 1.5px solid #F1E3C8; border-radius: 12px;
-    font-size: 14px; background: #FFFBF2; color: var(--ink); outline: none; transition: border .15s;
+  /* ---------- hero ---------- */
+  header { padding: 36px 4px 8px; }
+  h1 { font-size: 34px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.15; }
+  h1 em { font-style: normal; background: linear-gradient(120deg, var(--gold), #E08A00); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+  .sub { margin-top: 8px; font-size: 15px; color: var(--ink2); line-height: 1.55; }
+  .fries { display: block; margin: 22px auto 4px; }
+
+  /* ---------- cards ---------- */
+  .card { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); padding: 20px; margin-top: 16px; }
+  .sec { font-size: 13px; font-weight: 600; color: var(--ink2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .sec button { border: none; background: none; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; padding: 0; }
+
+  /* MBTI input */
+  .mbti-box { position: relative; }
+  .mbti-input {
+    width: 100%; padding: 15px 16px; font-size: 22px; font-weight: 700; letter-spacing: .2em;
+    border: 1.5px solid var(--sep); border-radius: 14px; outline: none; text-transform: uppercase;
+    background: var(--bg); transition: border-color .2s, box-shadow .2s; color: var(--ink);
   }
-  input:focus { border-color: var(--yellow); background: #fff; }
-  input::placeholder { color: #C4B299; }
+  .mbti-input:focus { border-color: var(--gold); box-shadow: 0 0 0 4px rgba(245,179,30,.18); background: #fff; }
+  .sug-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; min-height: 26px; }
+  .sug { padding: 5px 12px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 700; cursor: pointer; border: none; letter-spacing: .1em; }
+  .persona-chip {
+    display: none; margin-top: 12px; padding: 12px 14px; background: var(--accent-soft); border-radius: 12px;
+    font-size: 13.5px; line-height: 1.6; color: #7A5205;
+  }
+  .persona-chip b { font-size: 14px; }
+  .quiz-link { color: var(--ink2); }
 
-  /* ---------- CTA ---------- */
+  /* location */
+  .loc-btn {
+    width: 100%; padding: 14px; border-radius: 14px; border: none; cursor: pointer;
+    background: rgba(120,120,128,.1); color: var(--ink); font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px; transition: background .15s;
+  }
+  .loc-btn:active { background: rgba(120,120,128,.18); }
+  .loc-btn.busy { pointer-events: none; opacity: .6; }
+  .loc-status { margin-top: 10px; font-size: 13px; color: var(--ink2); text-align: center; min-height: 18px; line-height: 1.5; }
+  .loc-status.ok { color: var(--green); font-weight: 600; }
+  .loc-status.err { color: var(--red); }
+  .manual { display: none; margin-top: 12px; }
+  .manual.show { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .manual input {
+    width: 100%; padding: 12px 14px; font-size: 15px; border: 1.5px solid var(--sep); border-radius: 12px;
+    outline: none; background: var(--bg); color: var(--ink); font-family: inherit;
+  }
+  .manual input:focus { border-color: var(--gold); background: #fff; }
+  .manual input::placeholder { color: var(--ink3); }
+
+  /* CTA */
   .go {
-    width: 100%; margin-top: 18px; padding: 16px; font-size: 17px; font-weight: 800; letter-spacing: 6px;
-    color: var(--ink); background: linear-gradient(135deg, var(--yellow), #FFB81C);
-    border: none; border-radius: 14px; cursor: pointer; box-shadow: 0 8px 20px rgba(255,184,28,.4);
-    transition: transform .12s;
+    width: 100%; margin-top: 16px; height: 54px; border: none; border-radius: 16px; cursor: pointer;
+    font-size: 17px; font-weight: 700; letter-spacing: .02em; color: #4A2E00; font-family: inherit;
+    background: linear-gradient(180deg, #FFD34D, #F5B31E);
+    box-shadow: 0 8px 24px rgba(245,179,30,.35);
+    transition: transform .15s, opacity .2s;
   }
-  .go:active { transform: scale(.97); }
-  .go:disabled { opacity: .55; cursor: wait; }
+  .go:active { transform: scale(.98); }
+  .go:disabled { opacity: .5; }
 
-  /* ---------- fortune box loading ---------- */
-  .shake { display: none; text-align: center; padding: 30px 0 10px; font-size: 40px; }
-  .shake.on { display: block; animation: rattle .5s infinite; }
-  @keyframes rattle { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-8deg) translateY(-2px)} 75%{transform:rotate(8deg)} }
-  .shake p { font-size: 13px; color: var(--ink-soft); margin-top: 8px; letter-spacing: 2px; }
+  .loading { display: none; text-align: center; padding: 26px 0 6px; color: var(--ink2); font-size: 14px; }
+  .loading.on { display: block; }
+  .spinner { width: 26px; height: 26px; margin: 0 auto 10px; border: 3px solid rgba(245,179,30,.25); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ---------- sign card (签纸) ---------- */
-  .sign-card {
-    display: none; margin-top: 22px; position: relative; overflow: hidden;
-    background: linear-gradient(180deg, #FFFDF6, #FFF6E0);
-    border-radius: var(--radius); box-shadow: 0 12px 32px rgba(150,60,20,.16);
-    border: 1px solid #F3E3C0;
-  }
-  .sign-card.show { display: block; animation: rise .45s ease; }
-  @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; } }
-  .sign-top { background: var(--red); color: #fff; text-align: center; padding: 18px 20px 22px; position: relative; }
-  .sign-top::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 16px; background: radial-gradient(circle at 12px -6px, transparent 12px, #FFFDF6 13px) repeat-x; background-size: 24px 16px; }
-  .grade-chip { display: inline-block; background: var(--yellow); color: var(--ink); font-weight: 800; font-size: 13px; letter-spacing: 4px; padding: 5px 18px; border-radius: 999px; }
-  .sign-title { font-size: 21px; font-weight: 800; margin-top: 12px; line-height: 1.4; }
-  .sign-price { margin-top: 8px; }
-  .sign-price b { font-size: 30px; color: var(--yellow); }
-  .sign-price s { opacity: .65; margin-left: 8px; font-size: 14px; }
-  .sign-price .save { display: inline-block; margin-left: 10px; font-size: 12px; background: rgba(255,255,255,.18); padding: 2px 10px; border-radius: 999px; }
-  .sign-body { padding: 6px 22px 24px; }
-  .fortune {
-    margin: 14px 0; padding: 16px 18px; background: #fff; border-radius: 14px;
-    border: 1.5px dashed #E8C88A; font-size: 14.5px; line-height: 2; color: #6B4A12; text-align: center;
-    position: relative;
-  }
-  .fortune::before, .fortune::after { content: "❝"; position: absolute; color: #E8C88A; font-size: 22px; }
-  .fortune::before { left: 12px; top: 6px; } .fortune::after { content: "❞"; right: 12px; bottom: 6px; }
-  .pill-row { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 4px; }
-  .pill { font-size: 11.5px; color: var(--ink-soft); background: #F7EEDC; padding: 4px 12px; border-radius: 999px; }
-  .pill.hot { color: var(--red-dark); background: #FDE8E5; font-weight: 700; }
-  .alts { margin-top: 18px; }
-  .alts-title { font-size: 12px; color: var(--ink-soft); letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
-  .alt { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; background: #fff; border-radius: 10px; margin-bottom: 6px; font-size: 13px; }
-  .alt .g { color: var(--red); font-weight: 700; margin-right: 8px; }
-  .alt .p { color: var(--ink-soft); }
+  /* ---------- sign card ---------- */
+  .sign { display: none; margin-top: 24px; }
+  .sign.show { display: block; animation: rise .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes rise { from { opacity: 0; transform: translateY(16px) scale(.98); } to { opacity: 1; } }
+  .grade-line { display: flex; align-items: baseline; gap: 10px; }
+  .grade { font-size: 15px; font-weight: 800; color: var(--accent); letter-spacing: .12em; }
+  .score { font-size: 12px; color: var(--ink3); }
+  .product { font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-top: 6px; line-height: 1.3; }
+  .price-row { display: flex; align-items: baseline; gap: 10px; margin-top: 8px; }
+  .price-row b { font-size: 30px; font-weight: 800; letter-spacing: -0.03em; }
+  .price-row s { color: var(--ink3); font-size: 15px; }
+  .save-chip { font-size: 12px; font-weight: 700; color: #1B7A3D; background: rgba(52,199,89,.14); padding: 3px 10px; border-radius: 999px; }
+  .fortune { margin-top: 16px; padding: 16px; background: var(--bg); border-radius: 14px; font-size: 15px; line-height: 1.9; color: #4A3A20; }
+  .reasons { margin-top: 14px; }
+  .reasons-t { font-size: 13px; font-weight: 600; color: var(--ink2); margin-bottom: 8px; }
+  .reason { display: flex; gap: 8px; font-size: 13.5px; line-height: 1.6; color: var(--ink); padding: 7px 0; border-bottom: .5px solid var(--sep); }
+  .reason:last-child { border-bottom: none; }
+  .reason .tick { color: var(--green); font-weight: 700; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .meta-pill { font-size: 12px; color: var(--ink2); background: var(--bg); padding: 5px 11px; border-radius: 999px; }
+  .alts { margin-top: 16px; border-top: .5px solid var(--sep); padding-top: 12px; }
+  .alts-t { font-size: 12px; color: var(--ink3); margin-bottom: 6px; letter-spacing: .05em; }
+  .alt { display: flex; justify-content: space-between; align-items: center; padding: 10px 2px; font-size: 14px; border-bottom: .5px solid var(--sep); }
+  .alt:last-child { border-bottom: none; }
+  .alt .g { color: var(--accent); font-weight: 700; margin-right: 8px; font-size: 13px; }
+  .alt .p { color: var(--ink2); font-variant-numeric: tabular-nums; }
 
-  /* ---------- seal + order ---------- */
-  .order-zone { margin-top: 20px; text-align: center; }
+  /* order */
+  .order-zone { margin-top: 20px; }
   .btn-order {
-    padding: 14px 34px; font-size: 15px; font-weight: 800; letter-spacing: 2px; color: #fff;
-    background: linear-gradient(135deg, var(--red), var(--red-dark)); border: none; border-radius: 999px;
-    cursor: pointer; box-shadow: 0 8px 20px rgba(218,41,28,.35); transition: transform .12s;
+    width: 100%; height: 52px; border: none; border-radius: 16px; cursor: pointer; font-family: inherit;
+    font-size: 16px; font-weight: 700; color: #fff; background: var(--red); transition: transform .15s;
   }
-  .btn-order:active { transform: scale(.96); }
-  .order-note { font-size: 11px; color: var(--ink-soft); margin-top: 8px; }
+  .btn-order:active { transform: scale(.98); }
+  .safe-note { text-align: center; font-size: 12px; color: var(--ink3); margin-top: 10px; }
 
-  .pay-panel { display: none; margin-top: 16px; background: #fff; border-radius: 14px; padding: 18px; border: 1.5px solid #F1E3C8; }
-  .pay-panel.show { display: block; animation: rise .4s ease; }
-  .stepper { display: flex; justify-content: space-between; position: relative; margin: 6px 6px 18px; }
-  .stepper::before { content: ""; position: absolute; top: 9px; left: 24px; right: 24px; height: 2px; background: #EFE3CC; }
-  .st { position: relative; z-index: 1; text-align: center; font-size: 11px; color: #B7A88E; width: 72px; }
-  .st .dot { width: 20px; height: 20px; border-radius: 50%; background: #EFE3CC; margin: 0 auto 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; }
-  .st.done { color: var(--green); font-weight: 700; }
+  .pay { display: none; margin-top: 18px; padding-top: 18px; border-top: .5px solid var(--sep); }
+  .pay.show { display: block; animation: rise .4s cubic-bezier(.2,.8,.2,1); }
+  .stepper { display: flex; justify-content: space-between; margin: 4px 14px 18px; }
+  .st { text-align: center; font-size: 11.5px; color: var(--ink3); width: 70px; position: relative; }
+  .st::before { content: ""; position: absolute; top: 8px; left: -50%; right: 50%; height: 1.5px; background: var(--sep); }
+  .st:first-child::before { display: none; }
+  .st .dot { width: 17px; height: 17px; border-radius: 50%; background: var(--sep); margin: 0 auto 6px; color: transparent; font-size: 0; position: relative; z-index: 1; }
+  .st.cur { color: var(--accent); font-weight: 700; }
+  .st.cur .dot { background: var(--gold); animation: pulse 1.4s infinite; }
+  .st.done { color: var(--green); font-weight: 600; }
   .st.done .dot { background: var(--green); }
-  .st.cur { color: var(--red); font-weight: 700; }
-  .st.cur .dot { background: var(--red); animation: pulse 1.2s infinite; }
-  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(218,41,28,.4)} 50%{box-shadow:0 0 0 7px rgba(218,41,28,0)} }
-  .pay-link {
-    display: block; text-align: center; padding: 12px; background: #FFF6E0; border-radius: 10px;
-    color: var(--red-dark); font-weight: 700; font-size: 14px; text-decoration: none;
+  .st.done .dot::after { content: "✓"; color: #fff; font-size: 10px; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(245,179,30,.4); } 50% { box-shadow: 0 0 0 6px rgba(245,179,30,0); } }
+  .pay-btn {
+    display: block; text-align: center; height: 48px; line-height: 48px; border-radius: 14px;
+    background: rgba(120,120,128,.1); color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none;
   }
-  .order-meta { font-size: 12px; color: var(--ink-soft); margin-top: 10px; text-align: center; line-height: 1.8; }
-  .pickup { text-align: center; margin-top: 6px; }
-  .pickup .code { font-size: 40px; font-weight: 900; color: var(--red); letter-spacing: 6px; }
-  .pickup .lbl { font-size: 12px; color: var(--ink-soft); letter-spacing: 3px; }
-  .btn-poll { margin-top: 14px; padding: 11px 26px; font-size: 13px; font-weight: 700; border-radius: 999px; border: 1.5px solid var(--red); background: #fff; color: var(--red); cursor: pointer; }
-  .btn-cancel { margin-top: 10px; font-size: 12px; color: #B7A88E; background: none; border: none; cursor: pointer; text-decoration: underline; }
+  .order-meta { text-align: center; font-size: 12.5px; color: var(--ink2); margin-top: 12px; line-height: 1.7; }
+  .pickup { text-align: center; margin-top: 14px; }
+  .pickup .code { font-size: 44px; font-weight: 800; letter-spacing: .18em; font-variant-numeric: tabular-nums; }
+  .pickup .lbl { font-size: 11px; color: var(--ink3); letter-spacing: .2em; }
+  .row-btns { display: flex; gap: 10px; margin-top: 14px; }
+  .ghost-btn { flex: 1; height: 44px; border-radius: 13px; border: none; background: rgba(120,120,128,.1); color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .ghost-btn.warn { color: var(--red); }
 
-  .err { color: #A32D2D; font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; }
+  .err { color: var(--red); font-size: 13px; text-align: center; margin-top: 10px; min-height: 18px; line-height: 1.5; }
 
-  footer { text-align: center; margin-top: 34px; font-size: 11px; color: #C4B299; line-height: 2; }
-  footer b { color: var(--ink-soft); }
+  /* ---------- sheets (settings / quiz) ---------- */
+  .backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 90; opacity: 0; pointer-events: none; transition: opacity .3s; }
+  .backdrop.on { opacity: 1; pointer-events: auto; }
+  .sheet {
+    position: fixed; left: 50%; bottom: 0; transform: translate(-50%, 105%); width: 100%; max-width: 480px; z-index: 100;
+    background: var(--bg); border-radius: 22px 22px 0 0; padding: 10px 20px calc(24px + env(safe-area-inset-bottom));
+    transition: transform .38s cubic-bezier(.2,.8,.2,1); max-height: 86vh; overflow-y: auto;
+  }
+  .sheet.on { transform: translate(-50%, 0); }
+  .grabber { width: 36px; height: 5px; border-radius: 3px; background: rgba(60,60,67,.25); margin: 4px auto 14px; }
+  .sheet h2 { font-size: 20px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 4px; }
+  .sheet .hint { font-size: 13px; color: var(--ink2); margin-bottom: 16px; line-height: 1.5; }
+  .set-card { background: #fff; border-radius: 14px; overflow: hidden; }
+  .set-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: .5px solid var(--sep); }
+  .set-row:last-child { border-bottom: none; }
+  .set-label { font-size: 15px; }
+  .budget-chips { display: flex; gap: 8px; padding: 12px 16px 16px; flex-wrap: wrap; }
+  .chip { padding: 7px 16px; border-radius: 999px; border: 1.5px solid var(--sep); background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink); }
+  .chip.on { background: var(--accent-soft); border-color: var(--gold); color: var(--accent); }
+  .budget-input { width: 84px; padding: 7px 12px; border: 1.5px solid var(--sep); border-radius: 10px; font-size: 15px; text-align: right; outline: none; font-family: inherit; }
+  .switch { position: relative; width: 50px; height: 30px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .knob { position: absolute; inset: 0; background: rgba(120,120,128,.24); border-radius: 999px; cursor: pointer; transition: background .25s; }
+  .knob::after { content: ""; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .25s cubic-bezier(.2,.8,.2,1); }
+  .switch input:checked + .knob { background: var(--green); }
+  .switch input:checked + .knob::after { transform: translateX(20px); }
+  .sheet-done { width: 100%; height: 50px; margin-top: 16px; border: none; border-radius: 15px; background: var(--accent); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; font-family: inherit; }
+
+  /* quiz */
+  .q-progress { display: flex; gap: 6px; justify-content: center; margin: 6px 0 22px; }
+  .q-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(60,60,67,.2); transition: background .3s, width .3s; }
+  .q-dot.on { background: var(--gold); width: 20px; border-radius: 4px; }
+  .q-text { font-size: 21px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.4; margin-bottom: 18px; }
+  .q-opt {
+    display: block; width: 100%; text-align: left; padding: 16px; margin-bottom: 10px;
+    background: #fff; border: 1.5px solid var(--sep); border-radius: 14px; cursor: pointer; font-family: inherit;
+    font-size: 15px; line-height: 1.5; color: var(--ink); transition: border-color .15s, transform .1s;
+  }
+  .q-opt:active { transform: scale(.98); border-color: var(--gold); }
+  .q-opt small { display: block; color: var(--ink2); font-size: 12.5px; margin-top: 3px; }
+  .q-result-type { font-size: 44px; font-weight: 800; letter-spacing: .08em; text-align: center; color: var(--accent); }
+  .q-result-persona { text-align: center; font-size: 16px; font-weight: 700; margin-top: 4px; }
+  .q-why { margin-top: 16px; background: #fff; border-radius: 14px; padding: 4px 16px; }
+  .q-why .reason { font-size: 13px; }
+  .q-restart { display: block; margin: 16px auto 0; border: none; background: none; color: var(--ink2); font-size: 14px; text-decoration: underline; cursor: pointer; }
+
+  footer { text-align: center; margin-top: 36px; font-size: 12px; color: var(--ink3); line-height: 2; }
 </style>
 </head>
 <body>
+
+<nav><div class="nav-in">
+  <div class="nav-title">麦门<span>今日签</span></div>
+  <button class="icon-btn" id="settingsBtn" title="设置">⚙︎</button>
+</div></nav>
+
 <div class="wrap">
   <header>
-    <div class="arch">🍟</div>
-    <h1>麦门<span>今日签</span></h1>
-    <div class="tagline">你的 MBTI，决定你在麦门的命</div>
-    <div class="badges">
-      <span class="badge">MBTI 人格</span><span class="badge">实时天气</span><span class="badge">节气节日</span><span class="badge">真实券后价</span>
-    </div>
+    <h1>今天吃什么，<br>交给<em>命</em>。</h1>
+    <div class="sub">MBTI 人格 × 实时天气 × 节气 × 真实优惠券<br>抽出属于你的麦当劳今日签</div>
+    <svg class="fries" width="120" height="86" viewBox="0 0 120 86" fill="none" aria-hidden="true">
+      <g>
+        <rect x="28" y="8" width="9" height="52" rx="4.5" fill="#FFD34D" transform="rotate(-14 32 34)"/>
+        <rect x="44" y="2" width="9" height="56" rx="4.5" fill="#F5B31E"/>
+        <rect x="60" y="0" width="9" height="58" rx="4.5" fill="#FFD34D" transform="rotate(6 64 29)"/>
+        <rect x="76" y="6" width="9" height="54" rx="4.5" fill="#E8A11B" transform="rotate(14 80 33)"/>
+        <path d="M22 44 C22 40 26 38 30 38 L90 38 C94 38 98 40 98 44 L94 74 C93.4 78 90 80 86 80 L34 80 C30 80 26.6 78 26 74 Z" fill="#DA291C"/>
+        <path d="M22 44 C22 40 26 38 30 38 L90 38 C94 38 98 40 98 44 L97.5 47 C97 44 94 43 90 43 L30 43 C26 43 23 44 22.5 47 Z" fill="#B71C13" opacity=".55"/>
+        <path d="M40 55 C46 60 74 60 80 55" stroke="#FFD34D" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+      </g>
+    </svg>
   </header>
 
-  <div class="panel">
-    <div class="step-label"><span class="num">1</span>选你的命格</div>
-    <div class="grid" id="grid"></div>
-
-    <div class="step-label" style="margin-top:20px"><span class="num">2</span>告诉我你在哪</div>
-    <div class="fields">
-      <input id="city" placeholder="城市" value="厦门">
-      <input id="kw" placeholder="地标（如：观音山）">
-      <input id="budget" placeholder="预算上限 ¥（可选）" style="grid-column: span 2">
+  <div class="card">
+    <div class="sec"><span>你的 MBTI</span><button class="quiz-link" id="quizBtn">不知道？20 秒快测 →</button></div>
+    <div class="mbti-box">
+      <input class="mbti-input" id="mbtiInput" placeholder="如 INTJ" maxlength="4" autocomplete="off" spellcheck="false">
+      <div class="sug-row" id="sugRow"></div>
     </div>
-
-    <button class="go" id="go">求 一 签</button>
-    <div class="err" id="err1"></div>
-    <div class="shake" id="shake">🥡<p>正在摇签筒…</p></div>
+    <div class="persona-chip" id="personaChip"></div>
   </div>
 
-  <div class="sign-card" id="signCard">
-    <div class="sign-top">
-      <div class="grade-chip" id="grade"></div>
-      <div class="sign-title" id="pname"></div>
-      <div class="sign-price"><b id="price"></b><s id="orig"></s><span class="save" id="save" style="display:none"></span></div>
+  <div class="card">
+    <div class="sec"><span>位置</span></div>
+    <button class="loc-btn" id="locBtn">📍 使用我的位置</button>
+    <div class="loc-status" id="locStatus">授权定位后自动找到离你最近的麦当劳</div>
+    <div class="manual" id="manual">
+      <input id="city" placeholder="城市，如 厦门">
+      <input id="kw" placeholder="地标，如 观音山">
     </div>
-    <div class="sign-body">
+  </div>
+
+  <button class="go" id="go">求 一 签</button>
+  <div class="loading" id="loading"><div class="spinner"></div>正在结合天气、节气与实时菜单摇签…</div>
+  <div class="err" id="err1"></div>
+
+  <div class="sign" id="signCard">
+    <div class="card">
+      <div class="grade-line"><span class="grade" id="grade"></span><span class="score" id="score"></span></div>
+      <div class="product" id="pname"></div>
+      <div class="price-row"><b id="price"></b><s id="orig"></s><span class="save-chip" id="save" style="display:none"></span></div>
       <div class="fortune" id="fortune"></div>
-      <div class="pill-row" id="pills"></div>
+      <div class="reasons">
+        <div class="reasons-t">为什么是它</div>
+        <div id="reasons"></div>
+      </div>
+      <div class="meta-row" id="pills"></div>
       <div class="alts" id="alts"></div>
       <div class="order-zone">
-        <button class="btn-order" id="orderBtn">🙏 应签下单</button>
-        <div class="order-note">生成待支付订单 · 支付由你本人完成 · AI 不碰钱</div>
+        <button class="btn-order" id="orderBtn">应签下单 · 堂食</button>
+        <div class="safe-note">生成待支付订单 · 支付由你本人完成 · AI 不碰钱</div>
       </div>
-
-      <div class="pay-panel" id="payPanel">
+      <div class="pay" id="payPanel">
         <div class="stepper">
           <div class="st" id="st1"><div class="dot">1</div>待支付</div>
           <div class="st" id="st2"><div class="dot">2</div>配餐中</div>
           <div class="st" id="st3"><div class="dot">3</div>已完成</div>
         </div>
-        <a class="pay-link" id="payLink" target="_blank">📲 点此支付（建议发到微信里打开）</a>
+        <a class="pay-btn" id="payLink" target="_blank">📲 打开支付（建议发到微信里）</a>
         <div class="order-meta" id="orderMeta"></div>
-        <div class="pickup" id="pickup" style="display:none">
-          <div class="lbl">取 餐 码</div>
-          <div class="code" id="pickupCode"></div>
+        <div class="pickup" id="pickup" style="display:none"><div class="lbl">取 餐 码</div><div class="code" id="pickupCode"></div></div>
+        <div class="row-btns">
+          <button class="ghost-btn" id="pollBtn">我付完了，查状态</button>
+          <button class="ghost-btn warn" id="cancelBtn">取消订单</button>
         </div>
-        <button class="btn-poll" id="pollBtn">我付完了，查状态</button>
-        <button class="btn-cancel" id="cancelBtn">取消这单</button>
       </div>
       <div class="err" id="err2"></div>
     </div>
   </div>
 
-  <footer>
-    <b>麦门今日签</b> · WorkBuddy Skill × 麦当劳 MCP<br>
-    真实菜单 · 真实门店 · 真实优惠券 · 全链路真实下单
-  </footer>
+  <footer>麦门今日签 · WorkBuddy Skill × 麦当劳 MCP<br>真实菜单 · 真实门店 · 真实优惠券 · 全链路真实下单</footer>
+</div>
+
+<!-- 设置 sheet -->
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="settingsSheet">
+  <div class="grabber"></div>
+  <h2>设置</h2>
+  <div class="hint">这些偏好只保存在你的设备上</div>
+  <div class="set-card">
+    <div class="set-row"><span class="set-label">预算上限</span><input class="budget-input" id="budgetInput" type="number" min="0" placeholder="不限"></div>
+  </div>
+  <div class="budget-chips">
+    <button class="chip" data-b="">不限</button><button class="chip" data-b="15">¥15</button><button class="chip" data-b="20">¥20</button><button class="chip" data-b="30">¥30</button><button class="chip" data-b="50">¥50</button>
+  </div>
+  <div class="set-card">
+    <div class="set-row"><span class="set-label">求签时自动领取优惠券</span>
+      <label class="switch"><input type="checkbox" id="claimToggle" checked><span class="knob"></span></label>
+    </div>
+  </div>
+  <button class="sheet-done" id="settingsDone">完成</button>
+</div>
+
+<!-- MBTI 快测 sheet -->
+<div class="sheet" id="quizSheet">
+  <div class="grabber"></div>
+  <div id="quizBody"></div>
 </div>
 
 <script>
+/* ================= 数据 ================= */
 const PERSONA = {
-  INTJ:"效率军师", INTP:"思想哲学家", ENTJ:"指挥官", ENTP:"辩论家",
-  INFJ:"神秘引路人", INFP:"氛围诗人", ENFJ:"主人公", ESFP:"派对动物",
-  ISTJ:"守序会计师", ISFJ:"暖心管家", ESTJ:"执行官", ESFJ:"东道主",
-  ISTP:"酷手匠人", ISFP:"冒险艺术家", ESTP:"街头玩家", ENFP:"快乐小狗",
+  INTJ:["效率军师","固定套餐、按性价比算最优解"], INTP:["理性拆解者","拒绝套餐溢价，自己拼组合"],
+  ENTJ:["指挥官","直接点最大份"], ENTP:["尝鲜躁徒","看到新品就走不动路"],
+  INFJ:["治愈系","一人食，安静吃完"], INFP:["氛围诗人","看心情点单"],
+  ENFJ:["聚餐搭子","替全桌点，记住忌口"], ESFP:["派对动物","买的是快乐"],
+  ISTJ:["秩序践行者","只吃验证过的经典"], ISFJ:["温柔老好人","帮同事也带一份"],
+  ESTJ:["执行主管","效率优先"], ESFJ:["东道主","照顾每个人的口味"],
+  ISTP:["酷手匠人","实用主义"], ISFP:["冒险艺术家","颜值即正义"],
+  ESTP:["街头玩家","快节奏快决策"], ENFP:["快乐小狗","热情探索一切"],
 };
 const MBTI = Object.keys(PERSONA);
-let picked = null, lastSign = null, lastOrderId = null;
+const QUIZ = [
+  { q:"周五晚上，你更想要哪种夜宵局？", opts:[
+    ["组一桌朋友，热闹最重要","E · 从人群中获得能量"],["一个人安静吃点好的","I · 独处让你回血"]] },
+  { q:"看到菜单上没吃过的限定新品，你会？", opts:[
+    ["必须试试，猎奇优先","N · 好奇心驱动，关注可能性"],["还是熟悉的吧，稳","S · 依赖具体经验与熟悉感"]] },
+  { q:"帮朋友点餐时你先想什么？", opts:[
+    ["按 TA 的需求算性价比最优解","T · 先讲逻辑与效率"],["TA 今天心情不好，得点点开心的","F · 先共情人的感受"]] },
+  { q:"明天中午吃什么，你通常？", opts:[
+    ["昨天就定好了","J · 计划带来掌控感"],["到时候看心情","P · 即兴更自在"]] },
+  { q:"菜单上印了热量表，你会？", opts:[
+    ["认真算一下再点","T · 数据影响决策"],["大概率不会看","F · 跟着感觉走"]] },
+  { q:"前面排队 10 分钟，隔壁店走 10 分钟，你？", opts:[
+    ["就排这家，计划不变","J · 按既定方案执行"],["换一家看看，说不定有惊喜","P · 随机应变"]] },
+];
+const DIMS = ["EI","SN","TF","TF","JP","JP"]; // 每题对应维度（5、6 为加权补充）
+
+/* ================= 设置（localStorage） ================= */
+const settings = Object.assign({ budget: "", claim: true, mbti: "" }, JSON.parse(localStorage.getItem("mcd-sign-set") || "{}"));
+const saveSet = () => localStorage.setItem("mcd-sign-set", JSON.stringify(settings));
+
+/* ================= 元素 ================= */
 const $ = id => document.getElementById(id);
+const mbtiInput = $("mbtiInput"), sugRow = $("sugRow"), personaChip = $("personaChip");
+let picked = null, lastSign = null, lastOrderId = null, lastLoc = null;
 
-const grid = $("grid");
-MBTI.forEach(t => {
-  const d = document.createElement("div");
-  d.className = "mbti";
-  d.innerHTML = `<b>${t}</b><i>${PERSONA[t]}</i>`;
-  d.onclick = () => { picked = t; [...grid.children].forEach(c => c.classList.remove("on")); d.classList.add("on"); };
-  grid.appendChild(d);
+/* ================= MBTI 输入与匹配 ================= */
+function showPersona(t) {
+  picked = t;
+  const p = PERSONA[t];
+  personaChip.style.display = "block";
+  personaChip.innerHTML = `<b>${t} · ${p[0]}</b> — ${p[1]}`;
+  settings.mbti = t; saveSet();
+}
+mbtiInput.addEventListener("input", () => {
+  const v = mbtiInput.value.trim().toUpperCase().replace(/[^A-Z]/g, "");
+  mbtiInput.value = v;
+  personaChip.style.display = "none"; picked = null;
+  if (!v) { sugRow.innerHTML = ""; return; }
+  const exact = MBTI.includes(v);
+  const sug = exact ? [] : MBTI.filter(t => t.startsWith(v)).slice(0, 4);
+  sugRow.innerHTML = exact ? "" : sug.map(t => `<button class="sug" data-t="${t}">${t} · ${PERSONA[t][0]}</button>`).join("");
+  sugRow.querySelectorAll(".sug").forEach(b => b.onclick = () => { mbtiInput.value = b.dataset.t; showPersona(b.dataset.t); sugRow.innerHTML = ""; });
+  if (exact) showPersona(v);
 });
-MBTI.forEach(() => {}); // keep order
-grid.children[15].classList.add("on"); picked = "ENFP"; // default pick ENFP
 
-function setStep(n) {
-  [1,2,3].forEach(i => $("st"+i).className = "st" + (i <= n ? (i === n ? " cur" : " done") : ""));
-  $("st"+n).querySelector(".dot").textContent = n;
+/* ================= 快测 ================= */
+let quizIdx = 0, quizAns = [];
+function openSheet(s) { $("backdrop").classList.add("on"); s.classList.add("on"); }
+function closeSheets() { $("backdrop").classList.remove("on"); document.querySelectorAll(".sheet").forEach(x => x.classList.remove("on")); }
+$("backdrop").onclick = closeSheets;
+
+$("quizBtn").onclick = () => { quizIdx = 0; quizAns = []; renderQuiz(); openSheet($("quizSheet")); };
+
+function renderQuiz() {
+  const body = $("quizBody");
+  if (quizIdx < QUIZ.length) {
+    const q = QUIZ[quizIdx];
+    body.innerHTML = `
+      <h2>MBTI 快测</h2>
+      <div class="hint">凭直觉选，没有对错</div>
+      <div class="q-progress">${QUIZ.map((_, i) => `<div class="q-dot${i <= quizIdx ? " on" : ""}"></div>`).join("")}</div>
+      <div class="q-text">${quizIdx + 1}. ${q.q}</div>
+      ${q.opts.map((o, i) => `<button class="q-opt" data-i="${i}">${o[0]}<small>${o[1].split(" · ")[1] ?? ""}</small></button>`).join("")}`;
+    body.querySelectorAll(".q-opt").forEach(btn => btn.onclick = () => {
+      quizAns.push({ dim: DIMS[quizIdx], side: q.opts[btn.dataset.i][1].split(" · ")[0], why: q.opts[btn.dataset.i][1] });
+      quizIdx++; renderQuiz();
+    });
+  } else {
+    // 计分：每个维度取多数，平局按后答的题（更新的直觉）优先
+    const pick = {};
+    for (const dim of ["EI","SN","TF","JP"]) {
+      const votes = quizAns.filter(a => a.dim === dim);
+      const last = votes[votes.length - 1];
+      const cnt = s => votes.filter(v => v.side === s).length;
+      const a = last.side[0], b = last.side[1];
+      pick[dim] = cnt(a) >= cnt(b) ? a : b;
+    }
+    const type = pick.EI + pick.SN + pick.TF + pick.JP;
+    const whys = quizAns.filter(a => a.side[0] === pick[a.dim] || a.side[1] === pick[a.dim]).map(a => a.why);
+    const p = PERSONA[type];
+    body.innerHTML = `
+      <h2>你的命格</h2>
+      <div class="hint">根据 6 道题的倾向计算</div>
+      <div class="q-result-type">${type}</div>
+      <div class="q-result-persona">${p[0]}</div>
+      <div class="q-why">
+        <div class="reasons-t">为什么是这个</div>
+        ${whys.map(w => `<div class="reason"><span class="tick">✓</span><span>${w}</span></div>`).join("")}
+      </div>
+      <button class="sheet-done" id="useType">就它了，开始求签</button>
+      <button class="q-restart" id="qRestart">重新测一遍</button>`;
+    $("useType").onclick = () => { mbtiInput.value = type; showPersona(type); closeSheets(); };
+    $("qRestart").onclick = () => { quizIdx = 0; quizAns = []; renderQuiz(); };
+  }
 }
 
+/* ================= 定位 ================= */
+$("locBtn").onclick = () => {
+  const btn = $("locBtn"), st = $("locStatus");
+  if (!navigator.geolocation) { fallback("你的浏览器不支持定位"); return; }
+  btn.classList.add("busy"); btn.textContent = "正在请求定位权限…";
+  navigator.geolocation.getCurrentPosition(async pos => {
+    try {
+      const { latitude: lat, longitude: lon } = pos.coords;
+      const r = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=zh`);
+      const j = await r.json();
+      const city = (j.city || j.principalSubdivision || "").replace(/市$/, "");
+      const kw = j.locality || j.city || j.principalSubdivision || "";
+      if (!city) throw new Error("reverse fail");
+      lastLoc = { city, kw };
+      $("city").value = city; $("kw").value = kw === city ? "" : kw;
+      st.className = "loc-status ok";
+      st.textContent = `已定位：${j.city || city} · ${kw}（可点击重新定位）`;
+      btn.classList.remove("busy"); btn.textContent = "📍 重新定位";
+    } catch {
+      fallback("定位解析失败");
+    }
+  }, err => {
+    fallback(err.code === 1 ? "你拒绝了定位授权" : "定位失败");
+  }, { timeout: 8000 });
+
+  function fallback(msg) {
+    btn.classList.remove("busy"); btn.textContent = "📍 使用我的位置";
+    st.className = "loc-status err"; st.textContent = msg + "，请手动填写城市与地标";
+    $("manual").classList.add("show");
+    $("city").focus();
+  }
+};
+
+/* ================= 设置 sheet ================= */
+$("settingsBtn").onclick = () => {
+  $("budgetInput").value = settings.budget;
+  $("claimToggle").checked = settings.claim;
+  syncChips();
+  openSheet($("settingsSheet"));
+};
+function syncChips() {
+  document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", (c.dataset.b || "") === String(settings.budget)));
+}
+document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
+  settings.budget = c.dataset.b; $("budgetInput").value = c.dataset.b; saveSet(); syncChips();
+});
+$("budgetInput").oninput = e => { settings.budget = e.target.value; saveSet(); syncChips(); };
+$("claimToggle").onchange = e => { settings.claim = e.target.checked; saveSet(); };
+$("settingsDone").onclick = closeSheets;
+
+/* ================= 求签 ================= */
+function setStep(n) {
+  [1,2,3].forEach(i => $("st"+i).className = "st" + (i === n ? " cur" : i < n ? " done" : ""));
+}
 $("go").onclick = async () => {
-  if (!picked) { $("err1").textContent = "先选一个 MBTI，麦门不收无命之人"; return; }
-  $("err1").textContent = ""; $("go").disabled = true;
-  $("shake").classList.add("on"); $("signCard").classList.remove("show"); $("payPanel").classList.remove("show");
+  const mbti = mbtiInput.value.trim().toUpperCase();
+  if (!PERSONA[mbti]) { $("err1").textContent = "请输入有效的 MBTI（如 INTJ），或做一次 20 秒快测"; return; }
+  const city = $("city").value.trim(), kw = $("kw").value.trim();
+  if (!city) { $("err1").textContent = "还不知道你在哪 — 点「使用我的位置」，或手动填写城市"; $("manual").classList.add("show"); return; }
+  $("err1").textContent = "";
+  $("go").disabled = true; $("loading").classList.add("on");
+  $("signCard").classList.remove("show"); $("payPanel").classList.remove("show");
   try {
     const r = await fetch("/api/recommend", { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mbti: picked, city: $("city").value.trim(), keyword: $("kw").value.trim() || undefined,
-        budget: $("budget").value.trim() || undefined }) });
+      body: JSON.stringify({ mbti, city, keyword: kw || undefined,
+        budget: settings.budget || undefined, claimCoupons: settings.claim }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastSign = j.sign; lastSign.storeCode = j.store.storeCode; lastOrderId = null;
-    $("grade").textContent = j.sign.grade;
-    $("pname").textContent = j.sign.product;
-    $("price").textContent = "¥" + j.sign.price;
-    $("orig").textContent = j.sign.origPrice > j.sign.price ? "¥" + j.sign.origPrice : "";
-    const saveEl = $("save");
-    if (j.sign.origPrice > j.sign.price) {
-      saveEl.style.display = "inline-block";
-      saveEl.textContent = "立省 ¥" + (j.sign.origPrice - j.sign.price).toFixed(1);
-    } else saveEl.style.display = "none";
-    $("fortune").textContent = j.sign.fortune;
-    const pills = [`${PERSONA[picked]} · ${j.toneStyle}`, j.date + (j.term ? " · " + j.term : "") + (j.festival ? " · " + j.festival : ""), j.weather.line, j.store.storeName];
-    if (j.sign.coupon) pills.push("🎫 " + j.sign.coupon.title);
-    $("pills").innerHTML = pills.map(p => `<span class="pill">${p}</span>`).join("");
-    $("alts").innerHTML = `<div class="alts-title">—— 备 选 签 位 ——</div>` +
-      j.alternatives.map(a => `<div class="alt"><span><span class="g">${a.grade}</span>${a.product}</span><span class="p">¥${a.price}</span></div>`).join("");
-    $("payPanel").classList.remove("show");
-    $("signCard").classList.add("show");
-    $("signCard").scrollIntoView({ behavior: "smooth", block: "start" });
+    renderSign(j, mbti);
   } catch (e) { $("err1").textContent = "求签失败：" + e.message; }
-  $("go").disabled = false; $("shake").classList.remove("on");
+  $("go").disabled = false; $("loading").classList.remove("on");
 };
 
+function renderSign(j, mbti) {
+  const s = j.sign;
+  $("grade").textContent = s.grade;
+  $("score").textContent = "匹配度 " + (s.score * 100).toFixed(0) + "%";
+  $("pname").textContent = s.product;
+  $("price").textContent = "¥" + s.price;
+  $("orig").textContent = s.origPrice > s.price ? "¥" + s.origPrice : "";
+  const save = $("save");
+  if (s.origPrice > s.price) { save.style.display = "inline-block"; save.textContent = "省 ¥" + (s.origPrice - s.price).toFixed(1); }
+  else save.style.display = "none";
+  $("fortune").textContent = s.fortune;
+  $("reasons").innerHTML = (s.reasons ?? []).map(x => `<div class="reason"><span class="tick">✓</span><span>${x}</span></div>`).join("");
+  const pills = [`${mbti} · ${j.persona}`, j.date + (j.term ? " · " + j.term : "") + (j.festival ? " · " + j.festival : ""), j.weather.line, j.store.storeName];
+  if (s.coupon) pills.push("🎫 " + s.coupon.title);
+  $("pills").innerHTML = pills.map(p => `<span class="meta-pill">${p}</span>`).join("");
+  $("alts").innerHTML = `<div class="alts-t">备选签位</div>` +
+    j.alternatives.map(a => `<div class="alt"><span><span class="g">${a.grade}</span>${a.product}</span><span class="p">¥${a.price}</span></div>`).join("");
+  $("signCard").classList.add("show");
+  setTimeout(() => $("signCard").scrollIntoView({ behavior: "smooth", block: "start" }), 60);
+}
+
+/* ================= 下单闭环 ================= */
 $("orderBtn").onclick = async () => {
   const s = lastSign;
   if (!s) return;
   if (!confirm(`应签下单确认\n\n【${s.product}】\n¥${s.price} · 堂食\n\n将生成待支付订单，支付由你本人完成。`)) return;
   $("orderBtn").disabled = true; $("err2").textContent = "";
   try {
-    const payload = { storeCode: s.storeCode, orderType: 1, beType: 1, takeWayCode: "eat-in",
-      items: [{ productCode: s.code, quantity: 1 }] };
+    const payload = { storeCode: s.storeCode, orderType: 1, beType: 1, takeWayCode: "eat-in", items: [{ productCode: s.code, quantity: 1 }] };
     const r = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastOrderId = j.orderId;
     setStep(1);
     $("payLink").href = j.payH5Url;
-    $("orderMeta").textContent = `订单 ${j.orderId.slice(-8)} · 待支付 ¥${j.amount} · ${j.store ?? ""}`;
+    $("orderMeta").textContent = `订单 ${j.orderId.slice(-8)} · 待支付 ¥${j.amount}`;
     $("pickup").style.display = "none";
     $("payPanel").classList.add("show");
     $("payPanel").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -310,24 +565,25 @@ $("pollBtn").onclick = async () => {
     const s = j.status ?? "";
     const paid = !/待支付|待付|unpaid/i.test(s);
     const done = /已完成|完成|completed/i.test(s);
-    setStep(done ? 3 : (paid ? 2 : 1));
+    setStep(done ? 3 : paid ? 2 : 1);
     $("orderMeta").textContent = `订单状态：${s} · 实付 ¥${j.amount ?? "?"}`;
     if (j.pickupCode) { $("pickupCode").textContent = j.pickupCode; $("pickup").style.display = "block"; }
   } catch (e) { $("err2").textContent = "查询失败：" + e.message; }
 };
 
 $("cancelBtn").onclick = async () => {
-  if (!lastOrderId) return;
-  if (!confirm("确定取消这个待支付订单吗？")) return;
+  if (!lastOrderId || !confirm("确定取消这个待支付订单吗？")) return;
   try {
     const r = await fetch("/api/cancel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: lastOrderId }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     $("payPanel").classList.remove("show");
-    $("err2").textContent = "";
     $("orderMeta").textContent = "订单已取消";
   } catch (e) { $("err2").textContent = "取消失败：" + e.message; }
 };
+
+/* ================= 初始化 ================= */
+if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; showPersona(settings.mbti); }
 </script>
 </body>
 </html>

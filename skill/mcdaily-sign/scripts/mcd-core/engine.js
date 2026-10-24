@@ -125,8 +125,15 @@ export async function recommend(opts) {
   scored.sort((a, b) => b.total - a.total);
   const top = scored.slice(0, 3);
 
-  // 6. 签卡
+  // 6. 签卡（含推荐理由）
   const tone = TONES[profile.tone];
+  const wReason = {
+    hot: "天气炎热，冰爽单品此时最对味",
+    cold: "天气转凉，热乎的更抚人",
+    rain: "下雨天，炸物和热饮是绝配",
+    snow: "落雪天要吃热乎的正餐",
+    cool: "天气凉爽，正是好好吃顿正餐的时候",
+  }[weather.code];
   const results = top.map((s, rank) => {
     const c = {
       product: s.meal.name,
@@ -138,6 +145,17 @@ export async function recommend(opts) {
       menuCount: meals.length,
       pick: (s.idx + rank) % 2,
     };
+    // 推荐理由（用户要求：必须给出选择的理由）
+    const reasons = [];
+    const nameTags = s.meal.name + s.meal.tags.join("");
+    const matched = (profile.like ?? []).filter((w) => nameTags.includes(w));
+    if (matched.length) reasons.push(`${profile.persona}偏爱「${matched.slice(0, 2).join("、")}」，与本品高度契合`);
+    else reasons.push(`${profile.persona}的点餐哲学：${profile.behavior}`);
+    if (s.parts.weather >= 0.6 && wReason) reasons.push(wReason);
+    if (s.coupon) reasons.push(`自动匹配到优惠券「${s.coupon.title}」`);
+    if (dateInfo.festival) reasons.push(`今天${dateInfo.festival}，节点氛围加成`);
+    else if (dateInfo.term && s.parts.term >= 0.5) reasons.push(`${dateInfo.term}时节，${dateInfo.termLine}`);
+    if (s.meal.origPrice > s.meal.price) reasons.push(`现价 ¥${s.meal.price}（原价 ¥${s.meal.origPrice}），相当于 ${Math.round((1 - s.meal.price / s.meal.origPrice) * 100)} 折`);
     return {
       rank,
       grade: tone.grade[Math.min(2, rank)],
@@ -150,6 +168,7 @@ export async function recommend(opts) {
       tags: s.meal.tags,
       score: Number(s.total.toFixed(3)),
       parts: s.parts,
+      reasons,
       fortune: tone.make(c),
     };
   });
