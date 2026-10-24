@@ -387,7 +387,7 @@
 
 <div class="wrap">
   <div class="card lift">
-    <div class="sec"><span class="sec-t"><svg width="14" height="15" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-flame"/></svg>你的 MBTI 命格</span><button id="quizBtn">不知道？20 秒快测 →</button></div>
+    <div class="sec"><span class="sec-t"><svg width="14" height="15" viewBox="0 0 15 16" style="color:#DA291C"><use href="#i-flame"/></svg>你的 MBTI</span><button id="quizBtn">不知道？20 秒快测 →</button></div>
     <input class="mbti-input" id="mbtiInput" placeholder="如 INTJ" maxlength="4" autocomplete="off" spellcheck="false">
     <div class="sug-row" id="sugRow"></div>
     <div class="persona-chip" id="personaChip"></div>
@@ -613,7 +613,7 @@ function renderQuiz() {
     const whys = quizAns.filter(a => a.side === pick[a.dim]).map(a => a.why);
     const p = PERSONA[type];
     body.innerHTML = `
-      <h2>你的命格</h2><div class="hint">根据 6 道题的倾向计算</div>
+      <h2>你的 MBTI</h2><div class="hint">根据 6 道题的倾向计算</div>
       <div class="q-result-type">${type}</div><div class="q-result-persona">${p[0]}</div>
       <div class="q-why"><div class="reasons-t">为什么是这个</div>
       ${whys.map(w => `<div class="reason"><span style="color:var(--green);font-weight:700">✓</span><span>${w}</span></div>`).join("")}</div>
