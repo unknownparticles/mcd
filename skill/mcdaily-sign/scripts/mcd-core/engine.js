@@ -77,6 +77,15 @@ function termScore(dateInfo, f) {
 
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
+// 每日同签：date+mbti+mealcode 的确定性哈希微扰
+// → 同一天、同一 MBTI，全国用户抽到同一支签（社交话题钩子），次日自动换签（回访钩子）
+function daySeed(dateStr, mbti, code) {
+  let h = 2166136261;
+  const s = `${dateStr}|${(mbti ?? "").toUpperCase()}|${code}`;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0) / 4294967295;
+}
+
 // ---- 主流程 ----
 // opts: { token, mbti, city, keyword?, orderType?, beType?, claimCoupons? }
 export async function recommend(opts) {
@@ -112,15 +121,16 @@ export async function recommend(opts) {
     } catch { /* 领券失败不阻塞推荐 */ }
   }
 
-  // 5. 打分
+  // 5. 打分（叠加每日确定性微扰，人格/天气仍主导）
   const scored = mealsFinal.map((meal, i) => {
     const f = features(meal);
     const mbtiS = mbtiScore(profile, f, meal);
     const wS = weatherScore(weather.code, f);
     const { score: cS, coupon } = couponScore(meal, coupons);
     const tS = termScore(dateInfo, f);
-    const total = 0.5 * mbtiS + 0.2 * wS + 0.15 * cS + 0.15 * tS;
-    return { meal, features: f, coupon, total, parts: { mbti: mbtiS, weather: wS, coupon: cS, term: tS }, idx: i };
+    const seed = daySeed(dateStr, mbti, meal.code);
+    const total = 0.5 * mbtiS + 0.2 * wS + 0.15 * cS + 0.15 * tS + (seed - 0.5) * 0.04;
+    return { meal, features: f, coupon, total, seed, parts: { mbti: mbtiS, weather: wS, coupon: cS, term: tS }, idx: i };
   });
   scored.sort((a, b) => b.total - a.total);
   const top = scored.slice(0, 3);
@@ -143,7 +153,7 @@ export async function recommend(opts) {
       weatherLine: weather.weatherLine,
       termLine: dateInfo.festival ? `今日${dateInfo.festival}，${dateInfo.festivalLine}。` : (dateInfo.term ? `${dateInfo.term}时节，${dateInfo.termLine}。` : ""),
       menuCount: meals.length,
-      pick: (s.idx + rank) % 2,
+      pick: s.seed < 0.5 ? 0 : 1,
     };
     // 推荐理由（用户要求：必须给出选择的理由）
     const reasons = [];
@@ -169,6 +179,7 @@ export async function recommend(opts) {
       score: Number(s.total.toFixed(3)),
       parts: s.parts,
       reasons,
+      limited: dateInfo.festival ?? dateInfo.term ?? null, // 节气/节日限定签（收集图鉴）
       fortune: tone.make(c),
     };
   });
@@ -180,6 +191,7 @@ export async function recommend(opts) {
     date: dateStr,
     term: dateInfo.term,
     festival: dateInfo.festival,
+    dailySynced: true, // 每日同签：同日同人格全国同签
     weather: { tempC: weather.tempC, code: weather.code, line: weather.weatherLine },
     store: { storeCode: store.storeCode, storeName: store.storeName, address: store.address },
     sign: results[0],
