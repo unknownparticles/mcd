@@ -309,6 +309,12 @@
   .qr-box { width: 180px; height: 180px; margin: 14px auto 2px; border-radius: 14px; background: #fff; border: 1px solid var(--sep); display: flex; align-items: center; justify-content: center; overflow: hidden; }
   .qr-box img { width: 100%; height: 100%; display: block; }
   .uid-chip { display: inline-block; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; letter-spacing: .05em; color: var(--ink2); background: rgba(39,37,31,.06); border-radius: 6px; padding: 3px 9px; margin-top: 8px; }
+  /* 博饼 PNG 卡 */
+  .bo-card { position: relative; width: 150px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,.18); background: #fff; }
+  .bo-card img { display: block; width: 100%; height: auto; }
+  .bo-uid { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); font-family: ui-monospace, Menlo, monospace; font-size: 7px; letter-spacing: .04em; color: #27251F; background: rgba(255,255,255,.82); border-radius: 5px; padding: 1.5px 6px; white-space: nowrap; }
+  .my-card-chip .bo-card { width: 100%; border-radius: 10px; box-shadow: none; }
+  .pool-cell .pool-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; }
 
   /* quiz */
   .q-progress { display: flex; gap: 6px; justify-content: center; margin: 6px 0 22px; }
@@ -923,6 +929,17 @@ const CARD_ITEMS = [
   ["草莓圣代", "t-ice"], ["苹果派", "t-ice"], ["香芋派", "t-ice"], ["热香饼", "t-ice"],
   ["冰鲜柠檬水", "t-soda"], ["零度可乐", "t-soda"], ["焦糖玛奇朵", "t-coffee"], ["醇香拿铁", "t-coffee"],
 ];
+/* —— 博饼系列：50 张实拍立绘 PNG 卡（assets/bo/cards/），稀有度按 N52/R26/SR13/SSR7/SSSR2 精确分层 —— */
+const BO_COUNT = 50;
+const BO_RARITY_PLAN = ["N","R","SR","SSR","SSSR"].flatMap(k => {
+  const n = { N: 26, R: 13, SR: 7, SSR: 3, SSSR: 1 }[k];
+  return Array(n).fill(k);
+});
+const BO_PLAN_SHUFFLED = (() => { const r = rng(hashStr("bo-pool-rarity")); const a = [...BO_RARITY_PLAN]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; })();
+const BO_POOL = BO_PLAN_SHUFFLED.map((rar, i) => {
+  const r = Math.floor(i / 10) + 1, c = i % 10 + 1;
+  return { id: `bo|${i + 1}`, name: `博饼卡 #${String(i + 1).padStart(2, "0")}`, rarity: rar, ym: "博饼系列", bo: i + 1, img: `assets/bo/cards/card_r${r}c${c}.png` };
+});
 let myCards = JSON.parse(localStorage.getItem("mcd-cards") || "[]");
 let drawRec = JSON.parse(localStorage.getItem("mcd-draw") || "null");
 let dateInfoCache = null;
@@ -959,7 +976,12 @@ function rollRarity() {
 function todayPool() {
   const t = beijingDate(), ym = t.slice(0, 7);
   const fest = dateInfoCache && dateInfoCache.date === t ? (dateInfoCache.festival || dateInfoCache.term || "") : "";
-  return { fest, pool: [...(fest ? festivalPool(fest, ym) : []), ...monthPool(ym)] };
+  return { fest, pool: [...(fest ? festivalPool(fest, ym) : []), ...monthPool(ym), ...BO_POOL] };
+}
+/* 卡面统一渲染：博饼卡用 PNG，其余用 SVG */
+function cardVisual(card) {
+  if (card.img) return `<div class="bo-card"><img src="${card.img}" alt="${card.name}" loading="lazy"><span class="bo-uid">${card.uid || ""}</span></div>`;
+  return cardSVG(card);
 }
 /* —— 唯一码：设备码 + 出口 IP + 时间戳 —— */
 async function makeCardUid() {
@@ -1040,7 +1062,7 @@ function cardBackSVG() {
 function renderCardView() {
   const t = beijingDate();
   const drawn = drawRec && drawRec.date === t ? drawRec : null;
-  $("cardBox").innerHTML = drawn ? cardSVG(drawn) : cardBackSVG();
+  $("cardBox").innerHTML = drawn ? cardVisual(drawn) : cardBackSVG();
   if (drawn) { $("cardBox").classList.remove("pop"); void $("cardBox").offsetWidth; $("cardBox").classList.add("pop"); }
   $("cardWrap").querySelector(".rays")?.remove();
   if (drawn && (drawn.rarity === "SSSR" || drawn.rarity === "SSR")) { const r = document.createElement("div"); r.className = "rays"; $("cardWrap").prepend(r); }
@@ -1056,7 +1078,7 @@ function renderCardView() {
     if (seen.has(c.uid || c.id + c.ts)) continue; seen.add(c.uid || c.id + c.ts); owned.push(c);
   }
   $("myColl").innerHTML = owned.length
-    ? owned.map((c, i) => `<div class="my-card-chip" data-i="${i}" title="点此交换">${cardSVG(c)}<span class="sw">换</span></div>`).join("")
+    ? owned.map((c, i) => `<div class="my-card-chip" data-i="${i}" title="点此交换">${cardVisual(c)}<span class="sw">换</span></div>`).join("")
     : `<div style="padding:16px;font-size:12.5px;color:var(--ink3);width:100%;text-align:center">还没有卡牌 · 先抽今日卡</div>`;
   $("myColl").querySelectorAll(".my-card-chip").forEach(el => el.onclick = () => openTrade(owned[+el.dataset.i]));
   const gotNames = new Set(myCards.map(c => c.name));
@@ -1064,7 +1086,8 @@ function renderCardView() {
   $("poolHint").textContent = `${t.slice(0, 7)} 卡池 · 共 ${pool.length} 张${fest ? ` · 本期含限定「${fest}」` : ""} · 图鉴 ${gotNames.size}/${pool.length} · 藏卡 ${myCards.length}`;
   $("poolGrid").innerHTML = pool.map(c => {
     const R = RAR[c.rarity], has = gotNames.has(c.name);
-    return `<div class="pool-cell${has ? " got" : ""}"${has ? ` style="background:linear-gradient(140deg,${R.bg[0]},${R.bg[1]});color:${R.ink}"` : ""}><span class="rb"${has ? ` style="color:${R.ink}"` : ""}>${c.rarity}</span><span>${has ? c.name : "？"}</span></div>`;
+    const body = c.img ? (has ? `<img class="pool-thumb" src="${c.img}" alt="">` : `<svg width="26" height="20" style="opacity:.35;color:var(--ink3)"><use href="#i-arches"/></svg>`) : `<span>${has ? c.name : "？"}</span>`;
+    return `<div class="pool-cell${has ? " got" : ""}"${has && !c.img ? ` style="background:linear-gradient(140deg,${R.bg[0]},${R.bg[1]});color:${R.ink}"` : ""}><span class="rb"${has ? ` style="color:${R.ink}"` : ""}>${c.rarity}</span>${body}</div>`;
   }).join("");
 }
 async function loadDateInfo() {
@@ -1106,7 +1129,7 @@ $("drawBtn").onclick = async () => {
 };
 
 /* ================= 卡牌交换（二维码 / NFC / 链接） ================= */
-function cardPayload(c) { return { n: c.name, r: c.rarity, s: c.special || "", y: c.ym || "", u: c.uid, i: c.icon }; }
+function cardPayload(c) { return { n: c.name, r: c.rarity, s: c.special || "", y: c.ym || "", u: c.uid, i: c.icon, g: c.img || "" }; }
 function cardLink(c) {
   const b = btoa(unescape(encodeURIComponent(JSON.stringify(cardPayload(c))))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
   return `${location.origin}${location.pathname}#card=${b}`;
@@ -1116,14 +1139,15 @@ function parseCardLink(hash) {
     const m = (hash || "").match(/#card=([A-Za-z0-9\-_]+)/); if (!m) return null;
     const o = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/")))));
     if (!o.n || !RAR[o.r] || !o.u) return null;
-    return { name: String(o.n).slice(0, 24), rarity: o.r, special: String(o.s || "").slice(0, 12), ym: String(o.y || "").slice(0, 7), uid: String(o.u).slice(0, 24), icon: o.i || "t-fries", from: "交换" };
+    const img = typeof o.g === "string" && o.g.startsWith("assets/bo/cards/") && /^[\w\-.\/]\.png$/.test(o.g) ? o.g : "";
+    return { name: String(o.n).slice(0, 24), rarity: o.r, special: String(o.s || "").slice(0, 12), ym: String(o.y || "").slice(0, 7), uid: String(o.u).slice(0, 24), icon: o.i || "t-fries", img, from: "交换" };
   } catch { return null; }
 }
 let tradeCard = null;
 function openTrade(c) {
   if (!c.uid) return toast("这张是早期卡，没有唯一编号，不能交换");
   tradeCard = c;
-  $("tradeCard").innerHTML = cardSVG(c);
+  $("tradeCard").innerHTML = cardVisual(c);
   $("tradeUid").textContent = c.uid;
   $("tradeHint").textContent = "对方扫码（或碰一碰 NFC 标签）打开链接，即可收下这张卡";
   const qr = $("tradeQr");
@@ -1159,7 +1183,7 @@ function tryImport() {
   const c = parseCardLink(location.hash); if (!c) return;
   history.replaceState(null, "", location.pathname);
   recvCard = c;
-  $("recvCard").innerHTML = cardSVG(c);
+  $("recvCard").innerHTML = cardVisual(c);
   $("recvUid").textContent = c.uid;
   openSheet($("recvSheet"));
 }
