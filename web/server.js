@@ -74,6 +74,7 @@ const handler = async (req, res) => {
         keyword: body.keyword,
         budget: body.budget ? Number(body.budget) : undefined,
         claimCoupons: body.claimCoupons !== false,
+        salt: body.salt, // 设备级个人盐：保证每人签不同
         prefs: body.prefs && (body.prefs.like?.length || body.prefs.dislike?.length) ? body.prefs : undefined,
       });
       return json(200, r);

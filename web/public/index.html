@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>麦门今日签 · 每日全国同签</title>
+<title>麦门今日签 · 为你特制的每日签</title>
 <style>
   :root {
     --bg: #FFFFFF; --card: #FFFFFF; --paper: #FFFDF6;
@@ -415,8 +415,8 @@
       <span class="brand-name">麦门今日签</span>
       <span class="brand-en">MCDAILY FORTUNE</span>
     </div>
-    <div class="live-row"><span class="live-dot"></span><span id="liveText">今日全国同签进行中</span></div>
-    <h1>今天吃什么，全国<em>同签</em>。</h1>
+    <div class="live-row"><span class="live-dot"></span><span id="liveText">你的专属签 · 今日已就绪</span></div>
+    <h1>今天吃什么，签为你<em>特制</em>。</h1>
   </div>
 </div>
 
@@ -449,7 +449,7 @@
 
   <footer>
     <svg class="arches-f" width="30" height="24" viewBox="0 0 100 80" style="color:#D9B96A"><use href="#i-arches"/></svg><br>
-    麦门今日签 · 每日一签 · 全国同步 · 真实菜单 · 真实下单<br>
+    麦门今日签 · 每日一签 · 为你特制 · 真实菜单 · 真实下单<br>
     <a class="star-link" href="https://github.com/unknownparticles/mcd" target="_blank"><svg width="13" height="13" viewBox="0 0 15 15"><use href="#i-star"/></svg>为麦门添香火（Star）</a>
   </footer>
  </div>
@@ -464,7 +464,7 @@
       </div>
       <svg class="seal" width="42" height="42" viewBox="0 0 44 44"><use href="#i-seal"/></svg>
       <div class="paper-body">
-        <div class="grade-line"><span class="grade" id="grade"></span><span class="sync-chip">全国同签</span><span class="score" id="score"></span></div>
+        <div class="grade-line"><span class="grade" id="grade"></span><span class="sync-chip">专属签</span><span class="score" id="score"></span></div>
         <div class="product" id="pname"></div>
         <div class="price-row"><b id="price"></b><s id="orig"></s><span class="save-chip" id="save" style="display:none"></span></div>
         <div class="fortune" id="fortune"></div>
@@ -835,9 +835,12 @@ $("go").onclick = async () => {
   $("signCard").classList.remove("show"); $("payPanel").classList.remove("show");
   try {
     const prefs = { like: tasteKeywords("like"), dislike: tasteKeywords("dislike") };
+    // 设备级个人盐：同一天每人抽到的签不同（专属签的确定性来源之一）
+    let mySalt = localStorage.getItem("mcd-sign-salt");
+    if (!mySalt) { mySalt = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now()); localStorage.setItem("mcd-sign-salt", mySalt); }
     const r = await fetch("/api/recommend", { method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mbti, city, keyword: kw || undefined, budget: settings.budget || undefined, claimCoupons: settings.claim,
-        prefs: (prefs.like.length || prefs.dislike.length) ? prefs : undefined }) });
+        salt: mySalt, prefs: (prefs.like.length || prefs.dislike.length) ? prefs : undefined }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastSign = j.sign; lastSign.storeCode = j.store.storeCode;
@@ -970,8 +973,8 @@ $("shareBtn").onclick = async () => {
     // 标题：近黑粗体 + 金黄荧光笔高亮条
     x.fillStyle = GOLD; round(W / 2 - 168, 138, 336, 58, 14); x.fill();
     x.fillStyle = INK; x.font = FT(900, 46); x.fillText("麦门今日签", W / 2, 179);
-    // 红胶囊：全国同签 · 日期 · 节气
-    const pillTxt = `全国同签 · ${j.date}${j.term ? " · " + j.term : ""}${j.festival ? " · " + j.festival : ""}`;
+    // 红胶囊：专属签 · 日期 · 节气
+    const pillTxt = `专属签 · ${j.date}${j.term ? " · " + j.term : ""}${j.festival ? " · " + j.festival : ""}`;
     x.font = FT(600, 21); const pw = x.measureText(pillTxt).width + 52;
     x.fillStyle = RED; round(W / 2 - pw / 2, 216, pw, 44, 22); x.fill();
     x.fillStyle = "#FFFFFF"; x.fillText(pillTxt, W / 2, 245);
@@ -1050,7 +1053,7 @@ $("shareBtn").onclick = async () => {
     for (const b of boosts) { by += wrapText(x, "· " + b, W / 2, by, W - 180, 34, 12) * 34 + 6; }
     // footer（动态位置）+ 高度裁切
     const footY = by + 54;
-    x.fillStyle = INK; x.font = FT(700, 26); x.fillText("明天，签就换了。今天全国都吃这个。", W / 2, footY);
+    x.fillStyle = INK; x.font = FT(700, 26); x.fillText("明天，签就换了。这张签只属于你。", W / 2, footY);
     x.fillStyle = SUB; x.font = FT(400, 21); x.fillText("github.com/unknownparticles/mcd", W / 2, footY + 44);
     const finalH = footY + 198;
     const out = document.createElement("canvas");
@@ -1142,7 +1145,7 @@ $("cancelBtn").onclick = async () => {
 
 /* ================= 初始化 ================= */
 if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; showPersona(settings.mbti); }
-$("liveText").textContent = "今日全国同签 · " + todayStr().slice(5).replace("-", "月") + "日";
+$("liveText").textContent = "你的专属签 · " + todayStr().slice(5).replace("-", "月") + "日";
 
 /* ================= 支付跳转（用户手势内直接开新窗，被拦时复制兜底） ================= */
 function copyPayLink() {

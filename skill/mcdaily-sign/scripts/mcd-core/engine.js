@@ -88,11 +88,11 @@ function tasteDislikeHit(meal, prefs) {
   return tasteHits(meal, prefs?.dislike);
 }
 
-// 每日同签：date+mbti+mealcode 的确定性哈希微扰
-// → 同一天、同一 MBTI，全国用户抽到同一支签（社交话题钩子），次日自动换签（回访钩子）
-function daySeed(dateStr, mbti, code) {
+// 专属签：date+mbti+城市+口味+个人盐 的确定性哈希微扰
+// → 同一天同一人结果稳定可复现，次日自动换签（回访钩子）；不同人/不同城市/不同口味各得专属签
+function daySeed(dateStr, mbti, code, personal = "") {
   let h = 2166136261;
-  const s = `${dateStr}|${(mbti ?? "").toUpperCase()}|${code}`;
+  const s = `${dateStr}|${(mbti ?? "").toUpperCase()}|${code}|${personal}`;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
   return (h >>> 0) / 4294967295;
 }
@@ -137,13 +137,14 @@ export async function recommend(opts) {
   }
 
   // 5. 打分（叠加每日确定性微扰与私人订制口味，人格/天气仍主导）
+  const personalKey = [opts.city ?? "", opts.salt ?? "", (opts.prefs?.like ?? []).join(","), (opts.prefs?.dislike ?? []).join(",")].join("|");
   const scored = mealsFinal.map((meal, i) => {
     const f = features(meal);
     const mbtiS = mbtiScore(profile, f, meal);
     const wS = weatherScore(weather.code, f);
     const { score: cS, coupon } = couponScore(meal, coupons);
     const tS = termScore(dateInfo, f);
-    const seed = daySeed(dateStr, mbti, meal.code);
+    const seed = daySeed(dateStr, mbti, meal.code, personalKey);
     const likeHit = tasteHits(meal, opts.prefs?.like);
     const prefS = Math.min(0.4, likeHit.length * 0.2); // 每命中一个"爱吃"+0.2，封顶 +0.4 —— 显式偏好应压过人格默认
     const total = 0.5 * mbtiS + 0.2 * wS + 0.15 * cS + 0.15 * tS + prefS + (seed - 0.5) * 0.04;
@@ -210,7 +211,7 @@ export async function recommend(opts) {
     date: dateStr,
     term: dateInfo.term,
     festival: dateInfo.festival,
-    dailySynced: true, // 每日同签：同日同人格全国同签
+    personalized: true, // 专属签：按人（MBTI+城市+口味+设备盐）定制，每日刷新
     weather: { tempC: weather.tempC, code: weather.code, line: weather.weatherLine },
     store: { storeCode: store.storeCode, storeName: store.storeName, address: store.address },
     sign: results[0],
