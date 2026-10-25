@@ -95,7 +95,7 @@ function getToken() {
   throw new Error("未找到 MCP Token");
 }
 
-const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png" };
+const MIME = { ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".png": "image/png", ".webmanifest": "application/manifest+json", ".json": "application/json", ".ico": "image/x-icon" };
 
 function serveStatic(req, res) {
   let path = req.url === "/" ? "/index.html" : req.url.split("?")[0];
@@ -118,8 +118,27 @@ let ipCache = null, ipCacheAt = 0;
 let myIpCache = null, myIpAt = 0;
 
 const handler = async (req, res) => {
-  const json = (code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8" }); res.end(JSON.stringify(obj)); };
+  /* 跨域：GitHub Pages（静态页）里填了本服务地址后，浏览器会跨域调用这些 API。
+     只放行本地的麦当劳能力接口，Token 始终留在服务端，前端拿不到。 */
+  const ORIGIN = req.headers.origin || "";
+  const CORS = {
+    "Access-Control-Allow-Origin": ORIGIN || "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers": "content-type",
+    "Access-Control-Max-Age": "600",
+    "Vary": "Origin",
+  };
+  if (req.method === "OPTIONS" && req.url.startsWith("/api/")) {
+    res.writeHead(204, CORS); res.end(); return;
+  }
+  const json = (code, obj) => { res.writeHead(code, { "Content-Type": "application/json; charset=utf-8", ...CORS }); res.end(JSON.stringify(obj)); };
   try {
+    // 连通性探针：Pages 静态页填了服务地址后，先打这个确认能下单
+    if (req.url === "/api/health" && req.method === "GET") {
+      let hasToken = false, tokenErr = "";
+      try { getToken(); hasToken = true; } catch (e) { tokenErr = e.message; }
+      return json(200, { ok: true, service: "mcd-sign", hasToken, tokenErr, time: new Date().toISOString() });
+    }
     // 卡牌游戏用：今日节气/节日（北京时间）
     if (req.url === "/api/dateinfo" && req.method === "GET") {
       const d = new Date(Date.now() + 8 * 3600e3).toISOString().slice(0, 10);

@@ -3,8 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#FFFCF4">
+<meta name="theme-color" content="#DA291C">
 <meta name="description" content="麦门今日签：MBTI × 天气 × 节气 × 门店实时菜单，一人一签，签完铸卡，签卡可直接点餐。">
+<!-- PWA：可安装、可离线、桌面图标 -->
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="今日签">
 <title>麦门今日签 · 今天吃什么，签为你特制</title>
 <style>
   /* ============================================================
@@ -145,6 +153,10 @@
     font-size: 11px; line-height: 1.65; color: #6B4A00;
   }
   .demo-note.on { display: flex; }
+  .demo-note button {
+    all: unset; cursor: pointer; font-weight: 800; color: var(--red);
+    text-decoration: underline; text-underline-offset: 2px;
+  }
   .demo-note svg { flex: none; margin-top: 1px; color: #B07800; }
 
   /* ================= 布局 ================= */
@@ -670,6 +682,7 @@
     <symbol id="i-arches" viewBox="0 0 100 80">
       <path d="M8,78 C8,26 34,22 44,58 C46,64 47,70 47,78 M53,78 C53,26 79,22 89,58 C91,64 92,70 92,78" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round"/>
     </symbol>
+    <symbol id="i-download" viewBox="0 0 16 16"><path d="M8 2.2v7.1M5.1 6.6 8 9.6l2.9-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11.4v1.4c0 .6.5 1.1 1.1 1.1h7.8c.6 0 1.1-.5 1.1-1.1v-1.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
     <symbol id="i-cards" viewBox="0 0 15 16"><rect x="4.6" y="2" width="8.4" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3" transform="rotate(7 8.8 7.5)"/><rect x="2" y="2.6" width="8.4" height="11" rx="1.6" fill="currentColor" opacity=".16"/><rect x="2" y="2.6" width="8.4" height="11" rx="1.6" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4.6 6.2 h3.4 M4.6 8.4 h3.4" stroke="currentColor" stroke-width="1" opacity=".7"/></symbol>
     <symbol id="i-gear" viewBox="0 0 15 16">      <path d="M7.5,1.6 l.45,1.7 1.75,.4 1.25,-1.25 1.35,1.35 -1.25,1.25 .4,1.75 1.7,.45 v1.9 l-1.7,.45 -.4,1.75 1.25,1.25 -1.35,1.35 -1.25,-1.25 -1.75,.4 -.45,1.7 h-1.9 l-.45,-1.7 -1.75,-.4 -1.25,1.25 -1.35,-1.35 1.25,-1.25 -.4,-1.75 -1.7,-.45 v-1.9 l1.7,-.45 .4,-1.75 -1.25,-1.25 1.35,-1.35 1.25,1.25 1.75,-.4 .45,-1.7 z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
       <circle cx="7.5" cy="8.2" r="2.1" fill="none" stroke="currentColor" stroke-width="1.4"/>
@@ -750,6 +763,7 @@
     </div>
     <div class="appbar-r">
       <span class="streak-badge" id="streakBadge"><svg width="11" height="12" viewBox="0 0 15 16" style="color:#B07800"><use href="#i-flame"/></svg><span id="streakText"></span></span>
+      <button class="icon-btn" id="installBtn" title="安装到桌面" aria-label="安装到桌面" style="display:none"><svg width="16" height="17" viewBox="0 0 16 16"><use href="#i-download"/></svg></button>
       <button class="icon-btn" id="cardsBtn" title="麦门卡册" aria-label="麦门卡册"><svg width="16" height="17" viewBox="0 0 15 16"><use href="#i-cards"/></svg></button>
       <button class="icon-btn" id="settingsBtn" title="设置与签册" aria-label="设置"><svg width="16" height="17" viewBox="0 0 15 16"><use href="#i-gear"/></svg></button>
     </div>
@@ -899,7 +913,20 @@
   <div class="grabber"></div>
   <h2>设置</h2>
   <div class="hint">这些偏好只保存在你的设备上</div>
+  <h2 style="margin-top:18px">下单服务 · MCP</h2>
+  <div class="hint">当前是静态托管时没有后端，下单/订单状态需要一台跑着麦当劳 MCP Token 的服务。把它的地址填进来，本页就切到真实链路（Token 一直在那台服务上，不会进这个页面）。</div>
   <div class="set-card">
+    <div class="ai-row">
+      <div class="ai-lbl"><span>服务地址</span><span id="apiState" style="font-weight:600;color:var(--ink3)">未连接</span></div>
+      <input class="ai-key" id="apiBase" type="url" placeholder="http://192.168.1.5:8787 或 https://xxx.trycloudflare.com" autocomplete="off" spellcheck="false">
+    </div>
+  </div>
+  <div class="ai-acts">
+    <button class="ai-chip" id="apiTest">测试连接</button>
+    <button class="ai-chip" id="apiClear">断开</button>
+    <span class="ai-status" id="apiStatus">未连接 · 当前用内置菜单快照演示</span>
+  </div>
+  <div class="set-card" style="margin-top:12px">
     <div class="set-row"><span class="set-label">预算上限</span><input class="budget-input" id="budgetInput" type="number" min="0" placeholder="不限"></div>
   </div>
   <div class="budget-chips">
@@ -1169,7 +1196,7 @@ async function ipLoc(btn, st) {
   }
   btn.classList.add("busy"); btn.textContent = "正在网络定位…";
   try {
-    const r = await fetch("/api/iploc", { method: "POST" });
+    const r = await fetch(apiUrl("/api/iploc"), { method: "POST" });
     const j = await r.json();
     if (!j.city) throw new Error(j.error || "iploc fail");
     $("city").value = j.city; $("kw").value = "";
@@ -1212,6 +1239,7 @@ $("settingsBtn").onclick = () => {
   $("aiKey").value = AI_CFG.key;
   $("aiModel").value = AI_CFG.model;
   renderAiState();
+  renderApiState();
   document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", (c.dataset.b || "") === String(settings.budget)));
   renderTastes();
   renderColl();
@@ -1223,6 +1251,62 @@ document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
 });
 $("budgetInput").oninput = e => { settings.budget = e.target.value; saveSet(); };
 $("claimToggle").onchange = e => { settings.claim = e.target.checked; saveSet(); };
+
+/* ================= 下单服务（Pages 静态页 → 自己的 MCP 服务） ================= */
+// HTTPS 页面直连 HTTP 内网地址会被浏览器按混合内容拦掉（localhost 例外）
+function mixedContentBase() {
+  if (location.protocol !== "https:") return false;
+  if (!/^http:\/\//i.test(API_BASE)) return false;
+  return !/^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/i.test(API_BASE);
+}
+function renderApiState() {
+  const st = $("apiStatus"), sp = $("apiState"), inp = $("apiBase");
+  if (inp && document.activeElement !== inp) inp.value = API_BASE;
+  if (sp) sp.textContent = API_BASE ? "已填写" : "未连接";
+  if (!st) return;
+  if (API_BASE && mixedContentBase()) {
+    st.className = "ai-status err";
+    st.textContent = "这个地址是 HTTP，HTTPS 页面会被浏览器拦掉 —— 换 https 隧道地址（cloudflared / ngrok），或用本机 localhost";
+    return;
+  }
+  st.className = "ai-status" + (API_BASE ? " ok" : "");
+  st.textContent = API_BASE ? `指向 ${API_BASE} · 下单走真实 MCP` : "未连接 · 当前用内置菜单快照演示";
+}
+function syncMode() {
+  STATIC_MODE = computeStatic();
+  if (STATIC_MODE) showDemoNote(); else hideDemoNote();
+  renderApiState();
+  const tag = $("aiTag"); if (tag) tag.style.display = "none";
+}
+$("apiBase").oninput = e => {
+  API_BASE = e.target.value.trim().replace(/\/+$/, "");
+  localStorage.setItem("mcd-api-base", API_BASE);
+  syncMode();
+};
+$("apiClear").onclick = () => {
+  API_BASE = ""; localStorage.removeItem("mcd-api-base"); $("apiBase").value = "";
+  syncMode(); toast("已断开服务端 · 回到内置菜单演示");
+};
+$("apiTest").onclick = async () => {
+  const st = $("apiStatus"), btn = $("apiTest");
+  if (!API_BASE) { st.className = "ai-status err"; st.textContent = "先填服务地址再测"; return; }
+  if (mixedContentBase()) { renderApiState(); return; }
+  btn.disabled = true; st.className = "ai-status"; st.textContent = "正在连接…";
+  try {
+    const r = await fetch(API_BASE + "/api/health", { method: "GET" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || "服务返回异常");
+    st.className = "ai-status ok";
+    st.textContent = j.hasToken
+      ? "连接成功 · MCP Token 就绪，可以真实下单了"
+      : "连上了，但这台服务没配 MCD_TOKEN，下单会失败";
+    syncMode();
+  } catch (e) {
+    st.className = "ai-status err";
+    st.textContent = "连不上：" + e.message + "（检查地址是否正确、服务是否在跑、是否允许跨域）";
+  } finally { btn.disabled = false; }
+};
 
 /* AI 签文设置（DeepSeek，Key 只存本机） */
 $("aiKey").oninput = e => {
@@ -1349,7 +1433,7 @@ function cardVisual(card) {
 /* —— 唯一码：设备码 + 出口 IP + 时间戳 —— */
 async function makeCardUid() {
   let ip = "";
-  try { ip = ((await (await fetch("/api/myip")).json()).ip) || ""; } catch { /* 离线时用设备盐+时间戳 */ }
+  try { ip = ((await (await fetch(apiUrl("/api/myip"))).json()).ip) || ""; } catch { /* 离线时用设备盐+时间戳 */ }
   const salt = localStorage.getItem("mcd-sign-salt") || "";
   const raw = `${salt}|${ip}|${Date.now()}|${Math.random()}`;
   const seg = s => hashStr(raw + s).toString(36).toUpperCase().padStart(7, "0").slice(-6);
@@ -1553,13 +1637,13 @@ function setupRecvOrder(c) {
 }
 $("recvOrderBtn").onclick = async () => {
   const c = recvCard; if (!c) return;
-  if (STATIC_MODE) { toast("演示版不收单 — 卡可以收下，点餐请到本地服务里打开这张卡"); return; }
+  if (STATIC_MODE) { toast("还没连上服务端 —— 设置里填一下服务地址，就能真下单（卡照样能收）"); $("settingsBtn").click(); return; }
   if (!confirm(`照卡下单确认\n\n【${c.name}】${c.price ? "\n¥" + c.price : ""} · 堂食${c.storeName ? " · " + c.storeName : ""}\n\n将生成待支付订单，支付由你本人完成。`)) return;
   const btn = $("recvOrderBtn"), old = btn.textContent;
   btn.disabled = true; btn.textContent = "下单中…"; $("recvOrderMeta").textContent = "";
   try {
     const payload = { storeCode: c.storeCode, orderType: 1, beType: 1, takeWayCode: "eat-in", items: [{ productCode: c.code, quantity: 1 }] };
-    const r = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload }) });
+    const r = await fetch(apiUrl("/api/order"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     recvPayUrl = j.payH5Url || "";
@@ -1599,8 +1683,28 @@ tryImport(); // 页面带 #card= 链接打开（扫码/NFC/分享链接/签卡�
    这里用内置的【真实菜单快照】做本地求签，保证 求签 → 铸卡 → 分享 → 交换 全程可玩；
    「应签下单」需要本地运行服务（/api/order），演示模式下会明确提示。 */
 // 非本地服务（GitHub Pages / 自定义域名 / file://）一律走静态演示模式；?demo=1 可强制
+// 非本地服务（GitHub Pages / 自定义域名 / file://）默认走静态演示；
+// 但只要在设置里填了「服务地址」，所有 /api/* 就改走那台服务 —— 下单、轮询、取消立即恢复真实能力。
 const LOCAL_HOST = /^(localhost|127\.\d+\.\d+\.\d+|\[::1\]|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/i;
-const STATIC_MODE = location.protocol === "file:" || /[?&]demo=1/.test(location.search) || !LOCAL_HOST.test(location.hostname);
+let API_BASE = (localStorage.getItem("mcd-api-base") || "").trim().replace(/\/+$/, "");
+function apiUrl(path) { return API_BASE ? API_BASE + path : path; }
+function hasBackend() { return !!API_BASE || (location.protocol !== "file:" && LOCAL_HOST.test(location.hostname)); }
+function computeStatic() {
+  if (API_BASE) return false;                                   // 已连上自己的服务
+  if (/[?&]demo=1/.test(location.search)) return true;           // 强制演示
+  return true;                                                   // 默认按静态处理，启动时探测同源后端再切
+}
+let STATIC_MODE = computeStatic();
+// 同源是否真有后端（本地 node web/server.js）：探一下 /api/health，避免把静态托管的 localhost 误判成有后端
+async function probeBackend() {
+  if (API_BASE) return true;
+  try {
+    const r = await fetch("/api/health", { method: "GET" });
+    if (!r.ok) return false;
+    const j = await r.json();
+    return !!j.ok;
+  } catch { return false; }
+}
 /* [商品码, 名称, 现价, 原价, 图片] —— 取自门店真实菜单接口快照 */
 const DEMO_MENU = [["1100","巨无霸",26,26,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1100_320.png"],["1106","培根蔬萃双层牛堡",25,25,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1106_320.png"],["1120","双层吉士汉堡",23,23,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_1120_320.png"],["1401","麦乐鸡",14,14,"https://menu-img.mcd.cn/pcm/prod/menu/20260529/product/MS_G1401_320.png"],["1406","板烧鸡腿堡",23.5,23.5,"https://menu-img.mcd.cn/pcm/prod/menu/20241008/product/MS_1406_320.png"],["1440","麦辣鸡腿汉堡",22.5,22.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_1440_320.png"],["1600","麦香鱼",23,23,"https://menu-img.mcd.cn/pcm/prod/menu/20260101/product/MS_1600_320.png"],["1700","麦辣鸡翅",15,15,"https://menu-img.mcd.cn/pcm/prod/menu/20260325/product/MS_G1700_320.png"],["3010","雪碧",9.5,9.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G3010_320.png"],["4437","玉米杯",13,13,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G4437_320.png"],["4648","不素之霸双层牛堡",27,27,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_4648_320.png"],["4810","薯条",14.5,14.5,"https://menu-img.mcd.cn/pcm/prod/menu/20250523/product/MS_G4810_320_1747877491921.png"],["6102","苹果片",7,7,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_6102_320.png"],["6362","100% 苹果汁(盒装)",12,12,"https://menu-img.mcd.cn/pcm/prod/menu/20250430/product/MS_6362_320_1745552987716.png"],["507411","麦咖啡™美式",11.9,19,"https://menu-img.mcd.cn/pcm/prod/menu/20260422/product/MS_G507374_320.gif"],["511781","培根安格斯厚牛堡",34.5,34.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_511781_320.png"],["511782","芝士安格斯厚牛堡",31.5,31.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_511782_320.png"],["515280","阳光柠檬红茶",9.5,9.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G515280_320.png"],["515837","圆筒冰淇淋",5,5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G515837_320.png"],["521316","高达吉士双牛堡",22.5,22.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260309/product/MS_521316_320.png"],["521750","泷盐星星麦旋风",16.5,16.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521750_320.gif"],["521836","柠檬脆脆麦旋风",16.5,16.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521836_320.gif"],["521917","泷愿成真麦旋风——大米风味",16.5,16.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521917_320.gif"],["521950","蓝莓爆爆珠麦旋风",16.5,16.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521950_320.gif"],["521951","灰焰圆筒",5,5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G521951_320.gif"],["521952","龙焰鸡腿堡",15.9,24,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521952_320.png"],["521953","龙焰芝士棒鸡腿堡",27,27,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_521953_320.png"],["9900005456","麦辣鸡腿汉堡三件套",33.5,47,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005456_320.png"],["9900016073","龙焰鸡腿堡三件套",26.9,48.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016073_320.png"],["9900005460","麦香鱼套餐",34,47.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504968_320.png"],["9900005462","板烧鸡腿堡三件套",34.5,48,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005462_320.png"],["9900005464","双层吉士汉堡套餐",34,47.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504966_320.png"],["9900005466","巨无霸三件套",37,50.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005466_320.png"],["9900005449","吉士汉堡包套餐",26.5,40,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504971_320.png"],["9900005451","麦辣鸡翅4块套餐",36.5,50,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504972_320.png"],["9900016096","蘸酱韩式甜辣酱鸡块",11.9,18,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900016096_320.png"],["9900008751","可乐",9.5,9.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900008751_320.gif"],["9900008752","派",8,8,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G9900008752_320.gif"],["9900008754","经典麦旋风",15.5,15.5,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_G9900008754_320.gif"],["9900005468","培根蔬萃双层牛堡三件套",36,49.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005468_320.png"],["9900006957","安格斯厚牛堡四件套随心选",37,66,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900006957_320.png"],["9900005413","双层深海鳕鱼堡三件套",36,49.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_9900005413_320.png"],["9900004835","麦乐鸡套餐",25,38.5,"https://menu-img.mcd.cn/pcm/prod/menu/20260824/product/MS_G504969_320.png"],["9900003586","双层深海鳕鱼堡",25,25,"https://menu-img.mcd.cn/pcm/prod/menu/ProductPool/product/MS_9900003586_320.png"]];
 const DEMO_GRADES = ["麦门保佑签", "最优解签", "必胜签", "治愈签", "人间值得签", "全员满意签", "狂喜签", "整点新活签"];
@@ -1651,9 +1755,13 @@ function demoSign({ mbti, city, budget }) {
 }
 function showDemoNote() {
   const el = $("demoNote");
-  $("demoNoteText").textContent = "静态演示版（GitHub Pages）：求签、铸卡、分享签卡、交换全部可用；在设置里填入自己的 DeepSeek Key，签文就由 AI 现写；「应签下单」需要在本地运行 Node 服务并接入麦当劳 MCP Token。";
+  $("demoNoteText").innerHTML = "静态演示版：求签、铸卡、分享签卡、交换都能玩；填自己的 DeepSeek Key 签文就由 AI 现写。" +
+    "<br>想真实下单 → <button id=\"noteCfg\">连上我的服务端</button>";
   el.classList.add("on");
+  const b = $("noteCfg");
+  if (b) b.onclick = () => $("settingsBtn").click();
 }
+function hideDemoNote() { $("demoNote").classList.remove("on"); }
 
 /* ================= AI 签文 · DeepSeek（可选，自己在设置里填 Key） =================
    设计原则：零配置也能用（内置规则签文），填了 Key 才交给大模型现写。
@@ -1758,7 +1866,7 @@ $("go").onclick = async () => {
     let j = null, apiErr = null;
     if (!STATIC_MODE) {
       try {
-        const r = await fetch("/api/recommend", { method: "POST", headers: { "Content-Type": "application/json" },
+        const r = await fetch(apiUrl("/api/recommend"), { method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ mbti, city, keyword: kw || undefined, budget: settings.budget || undefined, claimCoupons: settings.claim,
             salt: mySalt, prefs: (prefs.like.length || prefs.dislike.length) ? prefs : undefined }) });
         const ct = r.headers.get("content-type") || "";
@@ -1846,7 +1954,7 @@ async function loadQimen() {
         const mod = await import("./assets/qimen.js");
         qimenCache = mod.qimen(new Date());
       } else {
-        qimenCache = await (await fetch("/api/qimen")).json();
+        qimenCache = await (await fetch(apiUrl("/api/qimen"))).json();
       }
       qimenAt = Date.now();
     }
@@ -2093,12 +2201,12 @@ $("shareOv").onclick = e => { if (e.target === $("shareOv")) $("shareOv").classL
 $("orderBtn").onclick = async () => {
   const s = lastSign;
   if (!s) return;
-  if (STATIC_MODE) { toast("静态演示版不连接下单接口 — 本地跑起 Node 服务就能真实下单"); return; }
+  if (STATIC_MODE) { toast("还没连上服务端 —— 设置里填一下服务地址，就能真实下单"); $("settingsBtn").click(); return; }
   if (!confirm(`应签下单确认\n\n【${s.product}】\n¥${s.price} · 堂食\n\n将生成待支付订单，支付由你本人完成。`)) return;
   $("orderBtn").disabled = true; $("err2").textContent = "";
   try {
     const payload = { storeCode: s.storeCode, orderType: 1, beType: 1, takeWayCode: "eat-in", items: [{ productCode: s.code, quantity: 1 }] };
-    const r = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload }) });
+    const r = await fetch(apiUrl("/api/order"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payload }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     lastOrder = j.orderId;
@@ -2120,7 +2228,7 @@ $("pollBtn").onclick = async () => {
   if (!lastOrder) { $("err2").textContent = "还没有订单，先应签下单"; return; }
   $("err2").textContent = "";
   try {
-    const r = await fetch("/api/poll", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: lastOrder }) });
+    const r = await fetch(apiUrl("/api/poll"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: lastOrder }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     const s = j.status ?? "";
@@ -2134,7 +2242,7 @@ $("pollBtn").onclick = async () => {
 $("cancelBtn").onclick = async () => {
   if (!lastOrder || !confirm("确定取消这个待支付订单吗？")) return;
   try {
-    const r = await fetch("/api/cancel", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: lastOrder }) });
+    const r = await fetch(apiUrl("/api/cancel"), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: lastOrder }) });
     const j = await r.json();
     if (j.error) throw new Error(j.error);
     $("payPanel").classList.remove("show");
@@ -2142,14 +2250,61 @@ $("cancelBtn").onclick = async () => {
   } catch (e) { $("err2").textContent = "取消失败：" + e.message; }
 };
 
+/* ================= PWA：安装到桌面 / 离线可用 / 快捷入口 ================= */
+let installEvt = null;
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js", { scope: "./" }).catch(() => { /* 不支持就算了，不影响使用 */ });
+  });
+}
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  installEvt = e;
+  $("installBtn").style.display = "";
+});
+window.addEventListener("appinstalled", () => {
+  $("installBtn").style.display = "none";
+  toast("装好了 · 断网也能抽签，桌面图标就是它");
+});
+$("installBtn").onclick = async () => {
+  if (!installEvt) return toast("在浏览器菜单里选「安装应用 / 添加到主屏幕」即可");
+  installEvt.prompt();
+  try { await installEvt.userChoice; } catch { /* 忽略 */ }
+  installEvt = null;
+  $("installBtn").style.display = "none";
+};
+// iOS Safari 不支持 beforeinstallprompt：给一次引导
+(() => {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if (isIOS && !standalone && !localStorage.getItem("mcd-ios-tip")) {
+    setTimeout(() => { toast("想装到桌面：Safari 分享 → 添加到主屏幕"); localStorage.setItem("mcd-ios-tip", "1"); }, 6500);
+  }
+})();
+// PWA 快捷方式：?act=draw 直接抽签，?act=cards 直接开卡册
+(() => {
+  const act = new URLSearchParams(location.search).get("act");
+  if (!act) return;
+  history.replaceState(null, "", location.pathname);
+  if (act === "cards") setTimeout(() => $("cardsBtn").click(), 600);
+  if (act === "draw") setTimeout(() => {
+    if (settings.mbti) $("go").click(); else { $("mbtiInput").focus(); $("go").scrollIntoView({ block: "center" }); }
+  }, 600);
+})();
+
 /* ================= 初始化 ================= */
 if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; showPersona(settings.mbti); }
 {
   const d = beijingDate().slice(5).split("-");
   $("liveText").textContent = `${Number(d[0])}月${Number(d[1])}日`;
 }
-if (STATIC_MODE) showDemoNote();
+if (STATIC_MODE) showDemoNote(); else hideDemoNote();
 renderAiState();          // 顶栏下方「AI 签文」状态 + 设置里的 Key 状态
+renderApiState();         // 下单服务地址状态
+probeBackend().then(ok => {
+  if (ok) { STATIC_MODE = false; hideDemoNote(); }
+  else if (!API_BASE) { STATIC_MODE = true; showDemoNote(); }
+});
 
 /* ================= 支付跳转（用户手势内直接开新窗，被拦时复制兜底） ================= */
 function copyPayLink() {

@@ -110,9 +110,18 @@ export async function recommend(opts) {
   const dateStr = nowResp.text.match(/(\d{4}-\d{2}-\d{2})/)?.[1] ?? new Date().toISOString().slice(0, 10);
   const dateInfo = resolveDate(dateStr);
 
-  // 2. 天气
-  const { lat, lon } = await geocode(city);
-  const weather = await getWeather(lat, lon);
+  // 2. 天气（open-meteo / 地理编码在部分网络下不可达 → 按季节估一个值，绝不让整次求签失败）
+  let weather;
+  try {
+    const { lat, lon } = await geocode(city);
+    weather = await getWeather(lat, lon);
+  } catch {
+    const m = Number(dateStr.slice(5, 7));
+    const tempC = [6, 7, 8].includes(m) ? 31 : [12, 1, 2].includes(m) ? 8 : [3, 4, 5].includes(m) ? 19 : 24;
+    const code = tempC >= 28 ? "hot" : tempC <= 5 ? "cold" : tempC <= 15 ? "cool" : "warm";
+    const lines = { hot: "外面热得像烤炉", warm: "天气不冷不热", cool: "外面有点凉", cold: "寒气逼人" };
+    weather = { tempC, wcode: 0, code, weatherLine: `${lines[code]}（${tempC}℃，天气接口未通，按季节估）` };
+  }
 
   // 3. 门店 + 菜单
   const storesResp = await mcd.stores(city, opts.keyword);
