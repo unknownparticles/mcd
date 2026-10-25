@@ -487,6 +487,39 @@
   .set-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: var(--sh-1); }
   .set-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 15px; border-bottom: 1px solid var(--line); }
   .set-row:last-child { border-bottom: none; }
+  .ai-row { padding: 13px 15px; border-bottom: 1px solid var(--line); }
+  .ai-row:last-child { border-bottom: none; }
+  .ai-lbl { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; font-weight: 700; color: var(--ink2); margin-bottom: 8px; }
+  .ai-key, .ai-sel {
+    width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; outline: none;
+    border: 1.5px solid var(--line); background: var(--paper2);
+    font-size: 13px; font-family: inherit; color: var(--ink); letter-spacing: .01em;
+  }
+  .ai-sel { height: 38px; padding: 0 8px; }
+  .ai-key:focus, .ai-sel:focus { border-color: var(--red); background: #fff; }
+  .ai-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 11px 0 4px; }
+  .ai-status { font-size: 11.5px; color: var(--ink3); line-height: 1.6; }
+  .ai-status.ok { color: #1A7F37; }
+  .ai-status.err { color: var(--red); }
+  .ai-line { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 11px; color: var(--ink3); padding: 4px 0 6px; flex-wrap: wrap; }
+  .ai-line b { color: var(--red); font-weight: 700; }
+  .ai-line button { all: unset; cursor: pointer; color: var(--red); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .ai-tag {
+    display: inline-flex; align-items: center; gap: 5px; margin-top: 9px;
+    padding: 3px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: .04em;
+    background: rgba(218, 41, 28, .08); color: var(--red);
+  }
+  .ai-chip {
+    padding: 8px 15px; border-radius: 999px; cursor: pointer;
+    border: 1.5px solid var(--line); background: #fff; color: var(--ink);
+    font-size: 12.5px; font-weight: 700; font-family: inherit;
+  }
+  .ai-chip:active { transform: scale(.97); }
+  .ai-tag.busy::before {
+    content: ""; width: 8px; height: 8px; border-radius: 50%;
+    border: 1.5px solid currentColor; border-top-color: transparent;
+    animation: rayspin .75s linear infinite;
+  }
   .set-label { font-size: 13.5px; font-weight: 600; }
   .budget-chips { display: flex; flex-wrap: wrap; gap: 7px; padding: 11px 0 15px; }
   .chip {
@@ -772,6 +805,7 @@
         <svg width="12" height="12" viewBox="0 0 16 16"><use href="#i-shake"/></svg>每天一签 · 明天就换 ·
         <button class="shake-on" id="shakeOn">开启摇一摇</button>
       </div>
+      <div class="ai-line" id="aiLine"></div>
       <div class="loading" id="loading">
         <svg class="cup" width="52" height="61" viewBox="0 0 60 70"><use href="#i-cup"/></svg>
         正在摇签筒 — 结合天气、节气与实时菜单…
@@ -802,6 +836,7 @@
             <div class="price-row"><b id="price"></b><s id="orig"></s><span class="save-chip" id="save" style="display:none"></span></div>
             <div class="prod-img" id="prodImg" style="display:none"><img id="prodPic" alt="" loading="lazy"></div>
             <blockquote class="fortune" id="fortune"></blockquote>
+            <div class="ai-tag" id="aiTag" style="display:none">AI 签文 · DeepSeek</div>
             <div class="reasons">
               <div class="reasons-t"><svg width="12" height="12" viewBox="0 0 15 15"><use href="#i-star"/></svg>为什么是它</div>
               <div id="reasons"></div>
@@ -874,6 +909,29 @@
     <div class="set-row"><span class="set-label">求签时自动领取优惠券</span>
       <label class="switch"><input type="checkbox" id="claimToggle" checked><span class="knob"></span></label>
     </div>
+  </div>
+  <h2 style="margin-top:20px">AI 签文 · DeepSeek</h2>
+  <div class="hint">不填也能用，签文走内置规则。填入后由 DeepSeek 现写你的签文 —— Key 只存在本机浏览器（localStorage），直连 api.deepseek.com，不经过本站服务器。</div>
+  <div class="set-card">
+    <div class="ai-row">
+      <div class="ai-lbl"><span>API Key</span><span id="aiKeyState" style="font-weight:600;color:var(--ink3)">未填写</span></div>
+      <input class="ai-key" id="aiKey" type="password" placeholder="sk-...（platform.deepseek.com 获取）" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="ai-row">
+      <div class="ai-lbl"><span>模型</span></div>
+      <select class="ai-sel" id="aiModel">
+        <option value="deepseek-chat">deepseek-chat · 快，够用</option>
+        <option value="deepseek-reasoner">deepseek-reasoner · 更会写</option>
+      </select>
+    </div>
+    <div class="set-row"><span class="set-label">用 AI 写签文</span>
+      <label class="switch"><input type="checkbox" id="aiOn"><span class="knob"></span></label>
+    </div>
+  </div>
+  <div class="ai-acts">
+    <button class="ai-chip" id="aiTest">测试连接</button>
+    <button class="ai-chip" id="aiClear">清除 Key</button>
+    <span class="ai-status" id="aiStatus">未开启 · 当前用规则签文</span>
   </div>
   <h2 style="margin-top:20px">口味订制 · 私人签</h2>
   <div class="hint">选了「爱吃」会优先出，选了「不吃」直接不会出现在你的签里</div>
@@ -1151,6 +1209,9 @@ $("backBtn").onclick = () => document.body.classList.remove("has-sign");
 $("settingsBtn").onclick = () => {
   $("budgetInput").value = settings.budget;
   $("claimToggle").checked = settings.claim;
+  $("aiKey").value = AI_CFG.key;
+  $("aiModel").value = AI_CFG.model;
+  renderAiState();
   document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", (c.dataset.b || "") === String(settings.budget)));
   renderTastes();
   renderColl();
@@ -1162,6 +1223,32 @@ document.querySelectorAll(".chip").forEach(c => c.onclick = () => {
 });
 $("budgetInput").oninput = e => { settings.budget = e.target.value; saveSet(); };
 $("claimToggle").onchange = e => { settings.claim = e.target.checked; saveSet(); };
+
+/* AI 签文设置（DeepSeek，Key 只存本机） */
+$("aiKey").oninput = e => {
+  AI_CFG.key = e.target.value.trim();
+  if (AI_CFG.key) AI_CFG.on = true;          // 填了 Key 默认就开，省一步
+  aiSave();
+};
+$("aiModel").onchange = e => { AI_CFG.model = e.target.value; aiSave(); };
+$("aiOn").onchange = e => { AI_CFG.on = e.target.checked; aiSave(); };
+$("aiClear").onclick = () => {
+  AI_CFG.key = ""; AI_CFG.on = false; $("aiKey").value = "";
+  aiSave(); toast("已清除本机保存的 DeepSeek Key");
+};
+$("aiTest").onclick = async () => {
+  const st = $("aiStatus"), btn = $("aiTest");
+  if (!AI_CFG.key) { st.className = "ai-status err"; st.textContent = "先填 Key 再测试"; return; }
+  btn.disabled = true; st.className = "ai-status"; st.textContent = "正在连接 DeepSeek…";
+  try {
+    const t = await deepseekChat([{ role: "user", content: "只回复两个字：可以" }], { max_tokens: 8, temperature: 0 });
+    st.className = "ai-status ok";
+    st.textContent = `${AI_CFG.model} 连接正常（返回「${t.slice(0, 8)}」）`;
+  } catch (e) {
+    st.className = "ai-status err";
+    st.textContent = "连接失败：" + e.message;
+  } finally { btn.disabled = false; }
+};
 $("settingsDone").onclick = closeSheets;
 
 /* ================= 口味订制（私人签） ================= */
@@ -1564,8 +1651,92 @@ function demoSign({ mbti, city, budget }) {
 }
 function showDemoNote() {
   const el = $("demoNote");
-  $("demoNoteText").textContent = "静态演示版（GitHub Pages）：求签、铸卡、分享签卡、交换全部可用；「应签下单」需要在本地运行 Node 服务并接入麦当劳 MCP Token。";
+  $("demoNoteText").textContent = "静态演示版（GitHub Pages）：求签、铸卡、分享签卡、交换全部可用；在设置里填入自己的 DeepSeek Key，签文就由 AI 现写；「应签下单」需要在本地运行 Node 服务并接入麦当劳 MCP Token。";
   el.classList.add("on");
+}
+
+/* ================= AI 签文 · DeepSeek（可选，自己在设置里填 Key） =================
+   设计原则：零配置也能用（内置规则签文），填了 Key 才交给大模型现写。
+   - Key 只存本机 localStorage，浏览器直连 api.deepseek.com（该接口已开放 CORS，可跨域直调）
+   - 任何失败（401/402/429/网络异常）都静默退回规则签文，不阻塞求签流程
+   - 换模型/换 Key 不需要改代码：设置里切 deepseek-chat / deepseek-reasoner */
+const AI_CFG = {
+  key: localStorage.getItem("mcd-ai-key") || "",
+  model: localStorage.getItem("mcd-ai-model") || "deepseek-chat",
+  on: (() => {
+    const v = localStorage.getItem("mcd-ai-on");
+    return v === null ? !!localStorage.getItem("mcd-ai-key") : v === "1";
+  })(),
+};
+function aiReady() { return !!(AI_CFG.key && AI_CFG.on); }
+function aiSave() {
+  localStorage.setItem("mcd-ai-key", AI_CFG.key);
+  localStorage.setItem("mcd-ai-model", AI_CFG.model);
+  localStorage.setItem("mcd-ai-on", AI_CFG.on ? "1" : "0");
+  renderAiState();
+}
+function renderAiState() {
+  const ks = $("aiKeyState"), st = $("aiStatus"), on = $("aiOn");
+  if (ks) ks.textContent = AI_CFG.key ? "已填 · " + AI_CFG.key.slice(0, 6) + "…" : "未填写";
+  if (on) on.checked = !!AI_CFG.on;
+  if (st) {
+    st.className = "ai-status" + (aiReady() ? " ok" : "");
+    st.textContent = aiReady()
+      ? `${AI_CFG.model} 已接入 · 下次求签由 AI 现写签文`
+      : AI_CFG.key ? "有 Key 但开关关着 · 仍在用规则签文" : "未开启 · 当前用规则签文（不填也能用）";
+  }
+  const line = $("aiLine");
+  if (line) {
+    line.innerHTML = aiReady()
+      ? `AI 签文：<b>已接入 ${AI_CFG.model}</b> · <button id="aiLineBtn">调整</button>`
+      : `AI 签文未开启 · <button id="aiLineBtn">填入 DeepSeek Key</button>（可选）`;
+    const b = $("aiLineBtn");
+    if (b) b.onclick = () => $("settingsBtn").click();
+  }
+}
+async function deepseekChat(messages, { max_tokens = 300, temperature = 1.2 } = {}) {
+  if (!AI_CFG.key) throw new Error("还没填 API Key");
+  const r = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + AI_CFG.key },
+    body: JSON.stringify({ model: AI_CFG.model, messages, temperature, max_tokens, stream: false }),
+  });
+  if (!r.ok) {
+    const map = { 400: "请求格式有误", 401: "Key 无效或已过期", 402: "账户余额不足", 422: "参数不对", 429: "请求太频繁，稍后再试", 500: "服务端异常", 503: "服务繁忙" };
+    throw new Error(`${map[r.status] || "调用失败"}（HTTP ${r.status}）`);
+  }
+  const j = await r.json();
+  const txt = (j.choices?.[0]?.message?.content || "").trim();
+  if (!txt) throw new Error("模型返回为空");
+  return txt;
+}
+async function aiPolishSign(j, mbti) {
+  const tag = $("aiTag"), s = j.sign;
+  tag.style.display = "inline-flex";
+  tag.classList.add("busy");
+  tag.textContent = "DeepSeek 正在写签文…";
+  try {
+    const persona = PERSONA[mbti] || ["这位麦友", "想吃点好的"];
+    const gate = j.mind ? `奇门心态：值使【${j.mind.zhiShi}】· ${j.mind.kw}（${j.mind.text}）` : "";
+    const ctx = [
+      `人格：${mbti} · ${persona[0]}（点餐哲学：${persona[1]}）`,
+      `今日：${j.date || beijingDate()} · ${(j.weather && j.weather.line) || "天气未知"}${j.term ? " · 节气" + j.term : ""}${j.festival ? " · 节日" + j.festival : ""}`,
+      `今日签：${s.product}（¥${s.price}，匹配度 ${Math.round((s.score || 0) * 100)}%，签格「${s.grade}」）`,
+      gate,
+    ].filter(Boolean).join("\n");
+    const txt = await deepseekChat([
+      { role: "system", content: "你是麦当劳「麦门今日签」的签文撰写人。写给当代年轻人的新中式签文：白话、有画面、可以带一点麦当劳梗，不装神弄鬼、不油腻、不说教、不用文言腔。只输出签文正文，70-95 个汉字，不要标题、不要引号、不要解释、不要分点。" },
+      { role: "user", content: `${ctx}\n\n写今天的签文：第一句点出今天的状态，中间把这顿饭说成今天最合适的解法，最后一句给一个具体可做的小动作（例如先咬第一口再回消息、吃完去走两圈）。` },
+    ], { max_tokens: 260, temperature: 1.25 });
+    if (lastSign && lastSign !== s) return;         // 期间又求了一次签 → 丢弃旧结果
+    typeFortune(txt);
+    tag.classList.remove("busy");
+    tag.textContent = "AI 签文 · " + AI_CFG.model;
+  } catch (e) {
+    tag.style.display = "none";
+    tag.classList.remove("busy");
+    toast(`AI 签文没写成（${e.message}），已用规则签文`);
+  }
 }
 
 /* ================= 求签 ================= */
@@ -1601,6 +1772,8 @@ $("go").onclick = async () => {
     bumpStreak();
     const limToasted = collectLimited(j, mbti);
     renderSign(j, mbti);
+    $("aiTag").style.display = "none";                 // 上一签的 AI 标签先清掉
+    if (aiReady()) aiPolishSign(j, mbti);              // 有 Key 就让 DeepSeek 现写签文（不阻塞铸卡）
     const mc = await mintSignCard(j);   // 签 → 专属收藏卡（分享签卡即此卡）
     if (mc && !limToasted) toast(`今日签已铸成 ${mc.rarity} 卡「${mc.name}」· 编号 ${mc.uid}`);
   } catch (e) { $("err1").textContent = "求签失败：" + e.message; }
@@ -1976,6 +2149,7 @@ if (settings.mbti && PERSONA[settings.mbti]) { mbtiInput.value = settings.mbti; 
   $("liveText").textContent = `${Number(d[0])}月${Number(d[1])}日`;
 }
 if (STATIC_MODE) showDemoNote();
+renderAiState();          // 顶栏下方「AI 签文」状态 + 设置里的 Key 状态
 
 /* ================= 支付跳转（用户手势内直接开新窗，被拦时复制兜底） ================= */
 function copyPayLink() {
